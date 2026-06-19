@@ -1,85 +1,94 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pokédex - RPG Pokémon</title>
-    <link rel="stylesheet" href="pokedex-style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pokédex — RPG Pokémon</title>
+  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="pokedex-style.css">
 </head>
 <body>
-    <div class="container">
-        <!-- Header -->
-        <header class="header">
-            <h1>🔴 Pokédex 🔵</h1>
-            <a href="../index.html" class="btn-voltar">← Voltar</a>
-        </header>
 
-        <!-- Controles -->
-        <div class="controls">
-            <div class="search-container">
-                <input type="text" id="searchInput" class="search-box" placeholder="🔍 Procurar Pokémon por nome ou número...">
-            </div>
-            
-            <div class="filter-container">
-                <select id="typeFilter" class="filter-select">
-                    <option value="">All Types</option>
-                    <option value="normal">Normal</option>
-                    <option value="fire">Fire</option>
-                    <option value="water">Water</option>
-                    <option value="electric">Electric</option>
-                    <option value="grass">Grass</option>
-                    <option value="ice">Ice</option>
-                    <option value="fighting">Fighting</option>
-                    <option value="poison">Poison</option>
-                    <option value="ground">Ground</option>
-                    <option value="flying">Flying</option>
-                    <option value="psychic">Psychic</option>
-                    <option value="bug">Bug</option>
-                    <option value="rock">Rock</option>
-                    <option value="ghost">Ghost</option>
-                    <option value="dragon">Dragon</option>
-                    <option value="dark">Dark</option>
-                    <option value="steel">Steel</option>
-                    <option value="fairy">Fairy</option>
-                </select>
+  <!-- NAVBAR -->
+  <nav class="navbar">
+    <div class="navbar-inner">
+      <a href="#" class="navbar-brand">
+        <div class="pokeball-icon"></div>
+        <span>RPG Pokémon</span>
+      </a>
+      <ul class="navbar-nav">
+        <li><a href="../ficha/index.html">📋 Ficha</a></li>
+        <li><a href="../pokedex/index.html" class="active">📖 Pokédex</a></li>
+        <li><a href="../regras/index.html">📜 Regras</a></li>
+      </ul>
+    </div>
+  </nav>
 
-                <button id="capturedFilter" class="filter-btn">
-                    📍 Apenas Capturados
-                </button>
+  <div class="pokedex-container">
 
-                <button id="resetBtn" class="reset-btn">
-                    🔄 Limpar Tudo
-                </button>
-            </div>
-
-            <div class="stats">
-                <span class="stat-item">Capturados: <strong id="capturedCount">0</strong></span>
-                <span class="stat-item">Total: <strong id="totalCount">0</strong></span>
-                <span class="stat-item">Progresso: <strong id="progressPercent">0%</strong></span>
-            </div>
-        </div>
-
-        <!-- Barra de Progresso -->
-        <div class="progress-bar-container">
-            <div class="progress-bar" id="progressBar"></div>
-        </div>
-
-        <!-- Grid de Pokémon -->
-        <div class="pokemon-grid" id="pokemonGrid">
-            <div class="loading">⏳ Carregando Pokédex...</div>
-        </div>
-
-        <!-- Modal de Detalhes -->
-        <div id="modalDetalhes" class="modal">
-            <div class="modal-content">
-                <span class="modal-close">&times;</span>
-                <div class="modal-body" id="modalBody">
-                    <!-- Conteúdo será carregado via JavaScript -->
-                </div>
-            </div>
-        </div>
+    <div class="page-hero">
+      <h1>📖 Pokédex</h1>
+      <p>Registre os Pokémon que você encontrou e capturou</p>
     </div>
 
-    <script src="pokedex-script.js"></script>
+    <!-- CONTROLS -->
+    <div class="pdx-controls section">
+      <div class="pdx-search-row">
+        <input type="text" id="searchInput" class="pdx-search"
+               placeholder="🔍 Buscar por nome ou número...">
+        <select id="typeFilter" class="pdx-type-filter">
+          <option value="">All Types</option>
+          <option value="normal">Normal</option>
+          <option value="fire">Fire</option>
+          <option value="water">Water</option>
+          <option value="electric">Electric</option>
+          <option value="grass">Grass</option>
+          <option value="ice">Ice</option>
+          <option value="fighting">Fighting</option>
+          <option value="poison">Poison</option>
+          <option value="ground">Ground</option>
+          <option value="flying">Flying</option>
+          <option value="psychic">Psychic</option>
+          <option value="bug">Bug</option>
+          <option value="rock">Rock</option>
+          <option value="ghost">Ghost</option>
+          <option value="dragon">Dragon</option>
+          <option value="dark">Dark</option>
+          <option value="steel">Steel</option>
+          <option value="fairy">Fairy</option>
+        </select>
+      </div>
+      <div class="pdx-btn-row">
+        <button id="capturedFilter" class="btn btn-secondary pdx-filter-btn">
+          📍 Apenas Capturados
+        </button>
+        <button id="resetBtn" class="btn btn-secondary">🔄 Limpar Capturas</button>
+      </div>
+      <div class="pdx-stats">
+        <span>Capturados: <strong id="capturedCount">0</strong></span>
+        <span>Total: <strong id="totalCount">0</strong></span>
+        <span>Progresso: <strong id="progressPercent">0%</strong></span>
+      </div>
+      <div class="pdx-progress-wrap">
+        <div class="pdx-progress-bar" id="progressBar"></div>
+      </div>
+    </div>
+
+    <!-- GRID -->
+    <div class="pdx-grid" id="pokemonGrid">
+      <div class="pdx-loading">⏳ Carregando Pokédex...</div>
+    </div>
+
+  </div><!-- /pokedex-container -->
+
+  <!-- MODAL -->
+  <div id="modalDetalhes" class="pdx-modal">
+    <div class="pdx-modal-content">
+      <button class="pdx-modal-close" id="modalClose">✕</button>
+      <div class="pdx-modal-body" id="modalBody"></div>
+    </div>
+  </div>
+
+  <script src="pokedex-script.js"></script>
 </body>
 </html>
