@@ -1,1 +1,366 @@
-hello world
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ficha de Personagem - RPG Pokémon</title>
+    <link rel="stylesheet" href="ficha-style.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <h1>📋 Ficha de Personagem Pokémon</h1>
+            <a href="../index.html" class="btn-voltar">← Voltar</a>
+        </header>
+
+        <!-- Formulário -->
+        <form class="ficha-form" id="fichaPokemon">
+            
+            <!-- SEÇÃO 1: INFORMAÇÕES PESSOAIS -->
+            <section class="section">
+                <h2 class="section-title">👤 Informações Pessoais</h2>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="nome">Nome:</label>
+                        <input type="text" id="nome" name="nome" placeholder="Digite seu nome" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="idade">Idade:</label>
+                        <input type="number" id="idade" name="idade" placeholder="Ex: 15" min="1" max="100">
+                    </div>
+                    <div class="form-group">
+                        <label for="sexo">Sexo:</label>
+                        <select id="sexo" name="sexo">
+                            <option value="">Selecione</option>
+                            <option value="masculino">Masculino</option>
+                            <option value="feminino">Feminino</option>
+                            <option value="outro">Outro</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Características Físicas -->
+                <h3 class="subsection-title">🎨 Características Físicas</h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="pele">Pele:</label>
+                        <input type="text" id="pele" name="pele" placeholder="Ex: Morena">
+                    </div>
+                    <div class="form-group">
+                        <label for="olhos">Olhos:</label>
+                        <input type="text" id="olhos" name="olhos" placeholder="Ex: Azuis">
+                    </div>
+                    <div class="form-group">
+                        <label for="cabelo">Cabelo:</label>
+                        <input type="text" id="cabelo" name="cabelo" placeholder="Ex: Preto comprido">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="altura">Altura (cm):</label>
+                        <input type="number" id="altura" name="altura" placeholder="Ex: 170" min="100" max="250">
+                    </div>
+                    <div class="form-group">
+                        <label for="peso">Peso (kg):</label>
+                        <input type="number" id="peso" name="peso" placeholder="Ex: 65" min="20" max="200" step="0.1">
+                    </div>
+                    <div class="form-group">
+                        <label for="maoDominante">Mão Dominante:</label>
+                        <select id="maoDominante" name="maoDominante">
+                            <option value="">Selecione</option>
+                            <option value="direita">Direita</option>
+                            <option value="esquerda">Esquerda</option>
+                            <option value="ambidestro">Ambidestro</option>
+                        </select>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SEÇÃO 2: CARACTERÍSTICAS E DEFEITOS -->
+            <section class="section">
+                <h2 class="section-title">⭐ Qualidades e Defeitos</h2>
+                <div class="form-row">
+                    <div class="form-group full-width">
+                        <label for="qualidadeAparente">Qualidade Mais Aparente:</label>
+                        <input type="text" id="qualidadeAparente" name="qualidadeAparente" placeholder="Ex: Coragem, Inteligência, Carisma...">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group full-width">
+                        <label for="defeitoAparente">Defeito Mais Aparente:</label>
+                        <input type="text" id="defeitoAparente" name="defeitoAparente" placeholder="Ex: Impulsividade, Ingenuidade...">
+                    </div>
+                </div>
+            </section>
+
+            <!-- SEÇÃO 3: SINERGIA COM TIPOS -->
+            <section class="section">
+                <h2 class="section-title">⚡ Sinergia por Tipo Pokémon</h2>
+                <div class="types-container">
+                    <div class="type-group">
+                        <h4>Tipos com Sinergia:</h4>
+                        <div class="form-row">
+                            <div class="form-group full-width">
+                                <input type="text" name="sinergiaType" placeholder="Ex: Elétrico, Fogo, Água..." 
+                                       id="sinergiaType">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="type-group">
+                        <h4>Outros (Sinergia):</h4>
+                        <div class="form-row">
+                            <div class="form-group full-width">
+                                <textarea name="sinergiaOutros" id="sinergiaOutros" placeholder="Descreva outras sinergias..." rows="3"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SEÇÃO 4: DESARMONIA COM TIPOS -->
+            <section class="section">
+                <h2 class="section-title">❌ Desarmonia por Tipo Pokémon</h2>
+                <div class="types-container">
+                    <div class="type-group">
+                        <h4>Tipos com Desarmonia:</h4>
+                        <div class="form-row">
+                            <div class="form-group full-width">
+                                <input type="text" name="disharmonyType" placeholder="Ex: Psíquico, Fantasma..." 
+                                       id="disharmonyType">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="type-group">
+                        <h4>Outros (Desarmonia):</h4>
+                        <div class="form-row">
+                            <div class="form-group full-width">
+                                <textarea name="disharmonyOutros" id="disharmonyOutros" placeholder="Descreva outras desarmonias..." rows="3"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SEÇÃO 5: PRETENSÃO FUTURA -->
+            <section class="section">
+                <h2 class="section-title">🎯 Pretensão Futura</h2>
+                <div class="form-row">
+                    <div class="form-group full-width">
+                        <label for="pretensaoFutura">Seu objetivo ou sonho:</label>
+                        <textarea id="pretensaoFutura" name="pretensaoFutura" placeholder="Ex: Ser um grande treinador Pokémon, ganhar badges, participar de torneios..." rows="4"></textarea>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SEÇÃO 6: POKÉMON PRINCIPAIS -->
+            <section class="section">
+                <h2 class="section-title">🔴 Pokémon Principais (6 slots)</h2>
+                <div class="pokemon-slots">
+                    <div class="pokemon-slot" data-slot="1">
+                        <div class="slot-number">1️⃣</div>
+                        <input type="text" name="pokemon1" placeholder="Nome do Pokémon" class="pokemon-name">
+                        <input type="number" name="level1" placeholder="Nível" min="1" max="100" class="pokemon-level">
+                        <select name="type1" class="pokemon-type">
+                            <option value="">Tipo</option>
+                            <option value="Normal">Normal</option>
+                            <option value="Fogo">Fogo</option>
+                            <option value="Água">Água</option>
+                            <option value="Elétrico">Elétrico</option>
+                            <option value="Grama">Grama</option>
+                            <option value="Gelo">Gelo</option>
+                            <option value="Lutador">Lutador</option>
+                            <option value="Veneno">Veneno</option>
+                            <option value="Terra">Terra</option>
+                            <option value="Voador">Voador</option>
+                            <option value="Psíquico">Psíquico</option>
+                            <option value="Inseto">Inseto</option>
+                            <option value="Rocha">Rocha</option>
+                            <option value="Fantasma">Fantasma</option>
+                            <option value="Dragão">Dragão</option>
+                            <option value="Sombrio">Sombrio</option>
+                            <option value="Aço">Aço</option>
+                            <option value="Fada">Fada</option>
+                        </select>
+                    </div>
+
+                    <div class="pokemon-slot" data-slot="2">
+                        <div class="slot-number">2️⃣</div>
+                        <input type="text" name="pokemon2" placeholder="Nome do Pokémon" class="pokemon-name">
+                        <input type="number" name="level2" placeholder="Nível" min="1" max="100" class="pokemon-level">
+                        <select name="type2" class="pokemon-type">
+                            <option value="">Tipo</option>
+                            <option value="Normal">Normal</option>
+                            <option value="Fogo">Fogo</option>
+                            <option value="Água">Água</option>
+                            <option value="Elétrico">Elétrico</option>
+                            <option value="Grama">Grama</option>
+                            <option value="Gelo">Gelo</option>
+                            <option value="Lutador">Lutador</option>
+                            <option value="Veneno">Veneno</option>
+                            <option value="Terra">Terra</option>
+                            <option value="Voador">Voador</option>
+                            <option value="Psíquico">Psíquico</option>
+                            <option value="Inseto">Inseto</option>
+                            <option value="Rocha">Rocha</option>
+                            <option value="Fantasma">Fantasma</option>
+                            <option value="Dragão">Dragão</option>
+                            <option value="Sombrio">Sombrio</option>
+                            <option value="Aço">Aço</option>
+                            <option value="Fada">Fada</option>
+                        </select>
+                    </div>
+
+                    <div class="pokemon-slot" data-slot="3">
+                        <div class="slot-number">3️⃣</div>
+                        <input type="text" name="pokemon3" placeholder="Nome do Pokémon" class="pokemon-name">
+                        <input type="number" name="level3" placeholder="Nível" min="1" max="100" class="pokemon-level">
+                        <select name="type3" class="pokemon-type">
+                            <option value="">Tipo</option>
+                            <option value="Normal">Normal</option>
+                            <option value="Fogo">Fogo</option>
+                            <option value="Água">Água</option>
+                            <option value="Elétrico">Elétrico</option>
+                            <option value="Grama">Grama</option>
+                            <option value="Gelo">Gelo</option>
+                            <option value="Lutador">Lutador</option>
+                            <option value="Veneno">Veneno</option>
+                            <option value="Terra">Terra</option>
+                            <option value="Voador">Voador</option>
+                            <option value="Psíquico">Psíquico</option>
+                            <option value="Inseto">Inseto</option>
+                            <option value="Rocha">Rocha</option>
+                            <option value="Fantasma">Fantasma</option>
+                            <option value="Dragão">Dragão</option>
+                            <option value="Sombrio">Sombrio</option>
+                            <option value="Aço">Aço</option>
+                            <option value="Fada">Fada</option>
+                        </select>
+                    </div>
+
+                    <div class="pokemon-slot" data-slot="4">
+                        <div class="slot-number">4️⃣</div>
+                        <input type="text" name="pokemon4" placeholder="Nome do Pokémon" class="pokemon-name">
+                        <input type="number" name="level4" placeholder="Nível" min="1" max="100" class="pokemon-level">
+                        <select name="type4" class="pokemon-type">
+                            <option value="">Tipo</option>
+                            <option value="Normal">Normal</option>
+                            <option value="Fogo">Fogo</option>
+                            <option value="Água">Água</option>
+                            <option value="Elétrico">Elétrico</option>
+                            <option value="Grama">Grama</option>
+                            <option value="Gelo">Gelo</option>
+                            <option value="Lutador">Lutador</option>
+                            <option value="Veneno">Veneno</option>
+                            <option value="Terra">Terra</option>
+                            <option value="Voador">Voador</option>
+                            <option value="Psíquico">Psíquico</option>
+                            <option value="Inseto">Inseto</option>
+                            <option value="Rocha">Rocha</option>
+                            <option value="Fantasma">Fantasma</option>
+                            <option value="Dragão">Dragão</option>
+                            <option value="Sombrio">Sombrio</option>
+                            <option value="Aço">Aço</option>
+                            <option value="Fada">Fada</option>
+                        </select>
+                    </div>
+
+                    <div class="pokemon-slot" data-slot="5">
+                        <div class="slot-number">5️⃣</div>
+                        <input type="text" name="pokemon5" placeholder="Nome do Pokémon" class="pokemon-name">
+                        <input type="number" name="level5" placeholder="Nível" min="1" max="100" class="pokemon-level">
+                        <select name="type5" class="pokemon-type">
+                            <option value="">Tipo</option>
+                            <option value="Normal">Normal</option>
+                            <option value="Fogo">Fogo</option>
+                            <option value="Água">Água</option>
+                            <option value="Elétrico">Elétrico</option>
+                            <option value="Grama">Grama</option>
+                            <option value="Gelo">Gelo</option>
+                            <option value="Lutador">Lutador</option>
+                            <option value="Veneno">Veneno</option>
+                            <option value="Terra">Terra</option>
+                            <option value="Voador">Voador</option>
+                            <option value="Psíquico">Psíquico</option>
+                            <option value="Inseto">Inseto</option>
+                            <option value="Rocha">Rocha</option>
+                            <option value="Fantasma">Fantasma</option>
+                            <option value="Dragão">Dragão</option>
+                            <option value="Sombrio">Sombrio</option>
+                            <option value="Aço">Aço</option>
+                            <option value="Fada">Fada</option>
+                        </select>
+                    </div>
+
+                    <div class="pokemon-slot" data-slot="6">
+                        <div class="slot-number">6️⃣</div>
+                        <input type="text" name="pokemon6" placeholder="Nome do Pokémon" class="pokemon-name">
+                        <input type="number" name="level6" placeholder="Nível" min="1" max="100" class="pokemon-level">
+                        <select name="type6" class="pokemon-type">
+                            <option value="">Tipo</option>
+                            <option value="Normal">Normal</option>
+                            <option value="Fogo">Fogo</option>
+                            <option value="Água">Água</option>
+                            <option value="Elétrico">Elétrico</option>
+                            <option value="Grama">Grama</option>
+                            <option value="Gelo">Gelo</option>
+                            <option value="Lutador">Lutador</option>
+                            <option value="Veneno">Veneno</option>
+                            <option value="Terra">Terra</option>
+                            <option value="Voador">Voador</option>
+                            <option value="Psíquico">Psíquico</option>
+                            <option value="Inseto">Inseto</option>
+                            <option value="Rocha">Rocha</option>
+                            <option value="Fantasma">Fantasma</option>
+                            <option value="Dragão">Dragão</option>
+                            <option value="Sombrio">Sombrio</option>
+                            <option value="Aço">Aço</option>
+                            <option value="Fada">Fada</option>
+                        </select>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SEÇÃO 7: RECURSOS -->
+            <section class="section">
+                <h2 class="section-title">💰 Recursos e Inventário</h2>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="pokemoney">Pokémoey:</label>
+                        <input type="number" id="pokemoney" name="pokemoney" placeholder="0" min="0" value="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="pokebolas">Pokébolas:</label>
+                        <input type="number" id="pokebolas" name="pokebolas" placeholder="0" min="0" value="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="fazendaPokemon">Fazenda Pokémon:</label>
+                        <input type="text" id="fazendaPokemon" name="fazendaPokemon" placeholder="Ex: Sim, Não, Em desenvolvimento...">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group full-width">
+                        <label for="mochila">Mochila (Inventário):</label>
+                        <textarea id="mochila" name="mochila" placeholder="Liste os itens que você está carregando..." rows="5"></textarea>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Botões de Ação -->
+            <div class="form-actions">
+                <button type="submit" class="btn btn-save">💾 Salvar Ficha</button>
+                <button type="reset" class="btn btn-reset">🔄 Limpar Campos</button>
+                <button type="button" class="btn btn-print" onclick="window.print()">🖨️ Imprimir</button>
+            </div>
+        </form>
+
+        <!-- Área de Visualização -->
+        <div id="preview" class="preview" style="display: none;"></div>
+    </div>
+
+    <script src="ficha-script.js"></script>
+</body>
+</html>
+
