@@ -7,6 +7,86 @@
   <link rel="stylesheet" href="../style.css">
   <style>
     .regras-container { max-width: 860px; margin: 0 auto; padding: 20px 20px 60px; }
+
+    .regras-intro {
+      color: var(--text-offwhite);
+      font-size: 0.92rem;
+      line-height: 1.6;
+      margin-bottom: 8px;
+    }
+
+    .regras-text {
+      color: var(--text-offwhite);
+      font-size: 0.88rem;
+      line-height: 1.6;
+      margin-bottom: 12px;
+    }
+
+    .micro-title {
+      font-size: 0.75rem;
+      font-weight: 800;
+      color: var(--pokeyellow);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin: 14px 0 8px;
+    }
+
+    .regras-warning {
+      font-size: 0.8rem;
+      color: var(--pokered-lite);
+      font-weight: 700;
+      margin: 10px 0 4px;
+    }
+
+    /* ---- CHIPS (sinergia/desarmonia exemplos) ---- */
+    .chip-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 6px;
+    }
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      padding: 6px 14px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.15);
+      color: var(--text-offwhite);
+      font-size: 0.8rem;
+      font-weight: 700;
+    }
+
+    /* ---- PROFISSÕES GRID ---- */
+    .micro-title {
+      margin-top: 22px;
+    }
+    .micro-title:first-of-type {
+      margin-top: 14px;
+    }
+    .profissoes-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+      gap: 10px;
+      margin-top: 10px;
+      margin-bottom: 4px;
+    }
+    .profissao-card {
+      background: rgba(255,255,255,0.04);
+      border: 2px solid rgba(255,255,255,0.10);
+      border-radius: var(--radius-md);
+      padding: 12px 14px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--text-white);
+      transition: var(--transition);
+    }
+    .profissao-card:hover {
+      border-color: rgba(248,208,48,0.4);
+      background: rgba(248,208,48,0.06);
+      transform: translateY(-2px);
+    }
+
     .empty-state {
       text-align: center;
       padding: 80px 20px;
@@ -18,6 +98,10 @@
       font-size: 0.8rem;
       color: var(--pokeyellow);
       margin-bottom: 12px;
+    }
+
+    @media (max-width: 600px) {
+      .profissoes-grid { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -42,10 +126,129 @@
       <p>Mecânicas e regras do sistema de RPG</p>
     </div>
 
-    <div class="section empty-state">
-      <div class="big-icon">🏗️</div>
-      <h2>Em construção</h2>
-      <p>O conteúdo das regras será adicionado aqui em breve pelo Mestre de Jogo.</p>
+    <!-- ===== INSTRUÇÕES DE CRIAÇÃO DE FICHA ===== -->
+    <div class="section">
+      <h2 class="section-title">📋 Instruções de Criação de Ficha</h2>
+      <p class="regras-intro">
+        Guia de preenchimento para os campos da ficha de treinador. Leia com atenção antes de
+        finalizar seu personagem — algumas escolhas aqui vão influenciar diretamente a sua
+        história e como você interage com o mundo Pokémon.
+      </p>
+
+      <!-- MÃO DOMINANTE -->
+      <h3 class="subsection-title">✋ Mão Dominante</h3>
+      <p class="regras-text">Escolha qual é a mão dominante do seu treinador:</p>
+      <div class="chip-row">
+        <span class="chip">Esquerda</span>
+        <span class="chip">Direita</span>
+        <span class="chip">Ambidestro</span>
+      </div>
+
+      <!-- SINERGIA POR TIPO -->
+      <h3 class="subsection-title">⚡ Sinergia por Tipo</h3>
+      <p class="regras-text">
+        É a tipagem Pokémon que você tem mais facilidade de compreender, gostar, capturar, etc.
+      </p>
+
+      <h4 class="micro-title">Outros (Sinergia)</h4>
+      <p class="regras-text">
+        Algum comentário de forma ou característica de Pokémon que você tem sinergia que
+        <strong>não</strong> seja por tipo.
+      </p>
+      <div class="chip-row">
+        <span class="chip">Pokémon gato</span>
+        <span class="chip">Pokémon canídeo</span>
+        <span class="chip">Eeveelution</span>
+        <span class="chip">Pokémon fofo</span>
+        <span class="chip">Pokémon humanoide</span>
+      </div>
+      <p class="regras-warning">⚠️ Não pode ser lendário ou mítico.</p>
+
+      <!-- DESARMONIA POR TIPO -->
+      <h3 class="subsection-title">💢 Desarmonia por Tipo</h3>
+      <p class="regras-text">
+        É a tipagem Pokémon que você tem medo, aflição, dificuldade em gostar, capturar etc.
+      </p>
+
+      <h4 class="micro-title">Outros (Desarmonia)</h4>
+      <p class="regras-text">
+        Algum comentário de forma ou característica de Pokémon que você tem desarmonia que
+        <strong>não</strong> seja por tipo.
+      </p>
+      <div class="chip-row">
+        <span class="chip">Pokémon gato</span>
+        <span class="chip">Pokémon canídeo</span>
+        <span class="chip">Eeveelution</span>
+        <span class="chip">Pokémon fofo</span>
+        <span class="chip">Pokémon humanoide</span>
+      </div>
+      <p class="regras-warning">⚠️ Não pode ser lendário ou mítico.</p>
+
+      <!-- PRETENSÃO FUTURA -->
+      <h3 class="subsection-title">🎯 Pretensão Futura</h3>
+      <p class="regras-text">
+        Seu objetivo de vida ou de emprego. Você pode escolher <strong>2</strong> (o principal e
+        o reserva), e pode trocar a qualquer momento se quiser — mas precisa justificar a troca
+        na história do seu personagem.
+      </p>
+
+      <h4 class="micro-title">🥊 Competição & Batalha</h4>
+      <div class="profissoes-grid">
+        <div class="profissao-card">🏟️ Líder de Ginásio</div>
+        <div class="profissao-card">👑 Membro da Elite / Campeão</div>
+        <div class="profissao-card">🥋 Mestre de Dojo</div>
+        <div class="profissao-card">🎪 Coordenador(a) de Contest</div>
+      </div>
+
+      <h4 class="micro-title">🌲 Campo & Natureza</h4>
+      <div class="profissoes-grid">
+        <div class="profissao-card">🌲 Pokémon Ranger</div>
+        <div class="profissao-card">🏕️ Criador(a) de Pokémon (Breeder)</div>
+        <div class="profissao-card">🌾 Fazendeiro(a) de Pokémon</div>
+        <div class="profissao-card">🗺️ Guia de Expedição</div>
+        <div class="profissao-card">🦴 Arqueólogo(a) / Paleontólogo(a)</div>
+        <div class="profissao-card">🐚 Mergulhador(a) / Explorador(a) Aquático</div>
+      </div>
+
+      <h4 class="micro-title">🔬 Ciência & Conhecimento</h4>
+      <div class="profissoes-grid">
+        <div class="profissao-card">🧪 Cientista</div>
+        <div class="profissao-card">🔬 Pesquisador(a)</div>
+        <div class="profissao-card">🎓 Professor(a)</div>
+        <div class="profissao-card">📚 Colecionador(a)</div>
+      </div>
+
+      <h4 class="micro-title">🏙️ Serviço Público & Segurança</h4>
+      <div class="profissoes-grid">
+        <div class="profissao-card">👮 Policial</div>
+        <div class="profissao-card">🕵️ Detetive</div>
+        <div class="profissao-card">💉 Enfermeiro(a)</div>
+        <div class="profissao-card">🚒 Bombeiro(a) / Resgate</div>
+      </div>
+
+      <h4 class="micro-title">🎨 Arte, Mídia & Performance</h4>
+      <div class="profissoes-grid">
+        <div class="profissao-card">👗 Estilista / Performer</div>
+        <div class="profissao-card">🎤 Idol</div>
+        <div class="profissao-card">📰 Jornalista / Repórter</div>
+        <div class="profissao-card">📺 Comentarista de Liga</div>
+        <div class="profissao-card">🎨 Artista / Ilustrador(a)</div>
+      </div>
+
+      <h4 class="micro-title">🛠️ Comércio & Ofícios</h4>
+      <div class="profissoes-grid">
+        <div class="profissao-card">🍳 Cozinheiro(a)</div>
+        <div class="profissao-card">🛒 Comerciante / Dono(a) de Loja</div>
+        <div class="profissao-card">📦 Entregador(a)</div>
+        <div class="profissao-card">🛠️ Artesão(ã) de Itens (Poké Balls, ferramentas)</div>
+        <div class="profissao-card">🚢 Marinheiro(a) / Capitão(ã)</div>
+        <div class="profissao-card">✈️ Piloto(a)</div>
+      </div>
+
+      <h4 class="micro-title">➕ Outra</h4>
+      <p class="regras-text" style="margin-bottom:0">
+        Não encontrou uma profissão que combine com seu treinador? Converse com o Mestre e crie a sua.
+      </p>
     </div>
   </div>
 </body>
