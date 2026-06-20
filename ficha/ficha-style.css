@@ -172,34 +172,51 @@
   grid-column: 1 / -1;
 }
 
-.level-display {
+/* ---- VIDA (9 BOLINHAS) ---- */
+.hp-bubbles {
   display: flex;
-  align-items: center;
-  gap: 10px;
+  gap: 6px;
+  flex-wrap: wrap;
   margin-top: 4px;
 }
 
-.level-bar-wrap {
-  flex: 1;
-  height: 8px;
-  background: rgba(255,255,255,0.1);
-  border-radius: 99px;
-  overflow: hidden;
-}
-
-.level-bar-fill {
-  height: 100%;
-  border-radius: 99px;
-  background: linear-gradient(90deg, var(--pokeyellow), var(--pokered));
-  transition: width 0.4s ease;
-}
-
-.level-badge {
-  font-family: 'Press Start 2P', monospace;
-  font-size: 0.55rem;
-  color: var(--pokeyellow);
-  white-space: nowrap;
+.hp-bubble {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 2px solid rgba(255,255,255,0.25);
+  background: rgba(255,255,255,0.04);
+  cursor: pointer;
+  transition: var(--transition);
   flex-shrink: 0;
+}
+.hp-bubble:hover {
+  transform: scale(1.15);
+  border-color: var(--pokeyellow);
+}
+.hp-bubble.filled {
+  background: linear-gradient(135deg, #ff5959, var(--pokered));
+  border-color: var(--pokered-dark);
+  box-shadow: 0 0 8px rgba(204,0,0,0.5);
+}
+.hp-bubble.filled:hover {
+  background: linear-gradient(135deg, #ff8080, var(--pokered-lite));
+}
+
+.hp-count {
+  display: inline-block;
+  margin-top: 8px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.6rem;
+  color: var(--pokeyellow);
+}
+
+.pokemon-slot.fainted {
+  border-color: rgba(204,0,0,0.4);
+  background: rgba(204,0,0,0.05);
+}
+.pokemon-slot.fainted .hp-count {
+  color: var(--pokered-lite);
 }
 
 /* Evo badges */

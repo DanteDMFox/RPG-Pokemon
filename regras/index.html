@@ -100,8 +100,133 @@
       margin-bottom: 12px;
     }
 
+    /* ---- LISTAS DE REGRAS ---- */
+    .regras-list {
+      margin: 0 0 14px;
+      padding-left: 20px;
+      color: var(--text-offwhite);
+      font-size: 0.88rem;
+      line-height: 1.7;
+    }
+    .regras-list li { margin-bottom: 6px; }
+
+    /* ---- CARDS DE REGRA (turnos, resolução de ataque) ---- */
+    .regra-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 14px;
+      margin: 14px 0 18px;
+    }
+    .regra-card {
+      background: rgba(255,255,255,0.04);
+      border: 2px solid rgba(255,255,255,0.10);
+      border-radius: var(--radius-md);
+      padding: 16px;
+    }
+    .regra-card-title {
+      font-weight: 800;
+      font-size: 0.88rem;
+      color: var(--pokeyellow);
+      margin-bottom: 8px;
+    }
+    .regra-card-text {
+      font-size: 0.84rem;
+      color: var(--text-offwhite);
+      line-height: 1.6;
+    }
+
+    /* ---- TABELA DE CA / DANO ---- */
+    .ca-table, .dano-table {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin: 14px 0 16px;
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      border: 2px solid rgba(255,255,255,0.08);
+    }
+    .ca-row, .dano-row {
+      display: grid;
+      grid-template-columns: 1.1fr 2fr 0.6fr;
+      gap: 10px;
+      align-items: center;
+      padding: 10px 14px;
+      background: rgba(255,255,255,0.03);
+      font-size: 0.84rem;
+      color: var(--text-offwhite);
+    }
+    .dano-row { grid-template-columns: 1.3fr 0.8fr 2fr; }
+    .ca-header, .dano-header {
+      background: rgba(255,255,255,0.08);
+      font-weight: 800;
+      text-transform: uppercase;
+      font-size: 0.7rem;
+      letter-spacing: 0.06em;
+      color: var(--pokeyellow);
+    }
+    .ca-tag, .dano-tag {
+      display: inline-flex;
+      width: fit-content;
+      padding: 3px 10px;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      font-weight: 800;
+    }
+    .ca-easy   { background: rgba(120,200,80,0.18); color: #78C850; }
+    .ca-medium { background: rgba(248,208,48,0.18); color: var(--pokeyellow); }
+    .ca-hard   { background: rgba(204,0,0,0.2);     color: var(--pokered-lite); }
+
+    .dano-fraco      { background: rgba(160,160,160,0.18); color: var(--text-gray); }
+    .dano-neutro     { background: rgba(90,109,224,0.2);   color: var(--pokeblue-lite); }
+    .dano-efetivo    { background: rgba(120,200,80,0.2);   color: #78C850; }
+    .dano-superforte { background: rgba(204,0,0,0.22);     color: var(--pokered-lite); }
+
+    /* ---- CARDS DE CONDIÇÃO DE STATUS ---- */
+    .cond-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 14px;
+      margin-top: 14px;
+    }
+    .cond-card {
+      border-radius: var(--radius-md);
+      padding: 16px;
+      background: rgba(255,255,255,0.04);
+      border: 2px solid rgba(255,255,255,0.10);
+      border-left: 4px solid rgba(255,255,255,0.3);
+    }
+    .cond-card .regras-text { margin-bottom: 0; font-size: 0.83rem; }
+    .cond-card-head {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 800;
+      font-size: 0.92rem;
+      color: var(--text-white);
+      margin-bottom: 6px;
+    }
+    .cond-icon { font-size: 1.1rem; }
+    .cond-card-chance {
+      font-size: 0.74rem;
+      font-weight: 700;
+      color: var(--text-gray);
+      margin-bottom: 10px;
+    }
+
+    .cond-BRN { border-left-color: #F08030; }
+    .cond-FRZ { border-left-color: #98D8D8; }
+    .cond-PAR { border-left-color: #F8D030; }
+    .cond-PSN { border-left-color: #A040A0; }
+    .cond-TOX { border-left-color: #7038F8; }
+    .cond-SLP { border-left-color: #A8A878; }
+
     @media (max-width: 600px) {
       .profissoes-grid { grid-template-columns: 1fr; }
+      .cond-grid { grid-template-columns: 1fr; }
+      .regra-grid { grid-template-columns: 1fr; }
+      .ca-row, .dano-row { grid-template-columns: 1fr; gap: 3px; }
+      .ca-header, .dano-header { display: none; }
+      .ca-row span:last-child, .dano-row span:last-child { font-weight: 800; color: var(--pokeyellow); }
     }
   </style>
 </head>
@@ -248,6 +373,334 @@
       <h4 class="micro-title">➕ Outra</h4>
       <p class="regras-text" style="margin-bottom:0">
         Não encontrou uma profissão que combine com seu treinador? Converse com o Mestre e crie a sua.
+      </p>
+    </div>
+
+    <!-- ===== REGRAS DE COMBATE ===== -->
+    <div class="section">
+      <h2 class="section-title">⚔️ Regras de Combate</h2>
+      <p class="regras-intro">
+        O combate usa um sistema enxuto baseado em <strong>9 bolinhas de vida</strong>,
+        <strong>d20</strong> e <strong>estágios de status (−6 a +6)</strong>. Os stats numéricos
+        da Pokédex não entram na conta — o que decide uma batalha é a leitura tática de tipos,
+        golpes e o gerenciamento dos estágios de Ataque, Defesa, Velocidade, Evasão e Precisão.
+      </p>
+
+      <!-- VIDA E ESTRUTURA -->
+      <h3 class="subsection-title">❤️ Vida e Estrutura do Combate</h3>
+      <p class="regras-text">
+        Todo Pokémon tem <strong>9 bolinhas de vida</strong>, exceto chefes (bosses), cuja vida é
+        definida pelo Narrador conforme a gravidade do encontro. Quando as bolinhas chegam a 0, o
+        Pokémon está <strong>Fainted (💀)</strong> e sai da batalha — narre o desmaio, não a morte.
+      </p>
+      <p class="regras-text">
+        Todo Pokémon entra em combate em <strong>status neutro</strong> (estágio 0 em todos os
+        atributos), independente do que a Pokédex mostra como stat base. Os valores numéricos da
+        Pokédex (HP, Atk, Def, Spd, etc.) <strong>não são usados</strong> durante a batalha — com
+        uma única exceção: a Velocidade base é consultada para decidir a ordem dos turnos após a
+        primeira ação (veja abaixo).
+      </p>
+      <div class="regra-grid">
+        <div class="regra-card">
+          <div class="regra-card-title">🎬 Início do combate</div>
+          <div class="regra-card-text">
+            O combate sempre começa de forma narrativa, não mecânica. Se a cena for uma
+            <strong>emboscada ou surpresa</strong>, o lado que surpreendeu age primeiro,
+            automaticamente, sem rolagem. Fora dessa situação, quem inicia a ação é definido pela
+            narrativa da cena (quem desafia, quem é abordado, etc).
+          </div>
+        </div>
+        <div class="regra-card">
+          <div class="regra-card-title">🐎 Ordem dos turnos seguintes</div>
+          <div class="regra-card-text">
+            Após o primeiro ataque, a ordem dos turnos passa a ser definida pela
+            <strong>Velocidade base da Pokédex</strong> — este é o único momento em que um stat
+            da Pokédex é consultado durante o combate. O Pokémon com Speed mais alto age primeiro
+            a partir daí. Não há rolagem de iniciativa.
+          </div>
+        </div>
+        <div class="regra-card">
+          <div class="regra-card-title">🎯 Resolução de ataque</div>
+          <div class="regra-card-text">
+            O atacante rola <strong>1d20</strong> contra a Classe de Armadura (CA) do alvo. Igualar
+            ou superar a CA significa acerto confirmado. Um <strong>20 natural</strong> é sempre
+            acerto crítico (veja abaixo); um <strong>1 natural</strong> é sempre erro, não importa
+            a CA.
+          </div>
+        </div>
+        <div class="regra-card">
+          <div class="regra-card-title">🥊 Ataque e Defesa unificados</div>
+          <div class="regra-card-text">
+            Este sistema não distingue Ataque/Defesa <em>Físico</em> de <em>Especial</em>. Para
+            todos os efeitos de jogo, golpes físicos e especiais usam os mesmos estágios de
+            <strong>Ataque</strong> e <strong>Defesa</strong> — ignore essa categorização da
+            Pokédex.
+          </div>
+        </div>
+      </div>
+
+      <!-- CLASSE DE ARMADURA -->
+      <h3 class="subsection-title">🛡️ Classe de Armadura (CA)</h3>
+      <p class="regras-text">
+        A CA representa o quão difícil é acertar o Pokémon adversário, com base na diferença de
+        força entre ele e o usuário (nível, experiência, contexto narrativo da cena):
+      </p>
+      <div class="ca-table">
+        <div class="ca-row ca-header">
+          <span>Dificuldade</span><span>Situação</span><span>CA</span>
+        </div>
+        <div class="ca-row">
+          <span class="ca-tag ca-easy">Fácil</span>
+          <span>Pokémon mais fraco que o usuário</span><span>5</span>
+        </div>
+        <div class="ca-row">
+          <span class="ca-tag ca-medium">Médio</span>
+          <span>Pokémon no mesmo nível que o usuário</span><span>10</span>
+        </div>
+        <div class="ca-row">
+          <span class="ca-tag ca-hard">Difícil</span>
+          <span>Pokémon mais forte que o usuário</span><span>15</span>
+        </div>
+      </div>
+      <p class="regras-text">
+        O Narrador pode ajustar a CA em ±2 por circunstâncias da cena (terreno, clima, vantagem de
+        tipo na esquiva, Pokémon encurralado, etc.) — sempre avisando o motivo antes da rolagem.
+      </p>
+      <p class="regras-text">
+        Essa CA base (5/10/15) é o ponto de partida; estágios de <strong>Velocidade</strong>
+        (positivos ou negativos) se somam diretamente a ela. Um Pokémon Médio (CA 10) com +2 de
+        Velocidade, por exemplo, passa a ter CA 12 enquanto o boost durar.
+      </p>
+
+      <!-- DANO -->
+      <h3 class="subsection-title">💥 Dano</h3>
+      <p class="regras-text">
+        O dano não depende do Power exato do golpe na Pokédex — ele depende da
+        <strong>efetividade de tipo</strong>. Isso mantém o combate rápido e garante que escolher
+        o golpe certo (não o "mais forte") seja a decisão tática mais importante da mesa.
+      </p>
+      <div class="dano-table">
+        <div class="dano-row dano-header">
+          <span>Resultado</span><span>Dano</span><span>Quando ocorre</span>
+        </div>
+        <div class="dano-row">
+          <span class="dano-tag dano-fraco">Não muito efetivo</span><span>1 bolinha</span>
+          <span>O tipo do golpe é fraco contra o tipo do alvo</span>
+        </div>
+        <div class="dano-row">
+          <span class="dano-tag dano-neutro">Neutro</span><span>2 bolinhas</span>
+          <span>Sem vantagem nem desvantagem de tipo</span>
+        </div>
+        <div class="dano-row">
+          <span class="dano-tag dano-efetivo">Super Efetivo</span><span>3 bolinhas</span>
+          <span>O tipo do golpe é forte contra o tipo do alvo</span>
+        </div>
+        <div class="dano-row">
+          <span class="dano-tag dano-superforte">Golpe Super Forte</span><span>4 bolinhas</span>
+          <span>Golpes de recarga, carregamento de 2 turnos ou Power 120+ (veja abaixo)</span>
+        </div>
+      </div>
+
+      <h4 class="micro-title">⚡ Golpes Super Fortes (recarga / 2 turnos)</h4>
+      <p class="regras-text">
+        Golpes com Power 120 ou mais na Pokédex (ex: Hyper Beam, Giga Impact, Solar Beam) causam
+        <strong>4 bolinhas de dano fixo</strong>, <em>independente da efetividade de tipo</em> —
+        eles representam o golpe mais pesado que aquele Pokémon pode desferir. Em compensação,
+        carregam uma penalidade narrativa e mecânica:
+      </p>
+      <ul class="regras-list">
+        <li><strong>Recarga:</strong> após usar o golpe, o Pokémon não pode agir no turno seguinte
+        (ele está exausto, recuperando o fôlego). Narre isso como abertura para o oponente.</li>
+        <li><strong>Carregamento (2 turnos):</strong> golpes que "carregam energia" (ex: Solar
+        Beam, Sky Attack) exigem um turno de preparação antes de serem resolvidos. No turno de
+        carga, o usuário pode ser interrompido se levar um golpe Super Efetivo — o ataque falha e
+        a energia se perde.</li>
+      </ul>
+
+      <h4 class="micro-title">🌟 Acerto Crítico (20 natural)</h4>
+      <p class="regras-text">
+        Quando o d20 do ataque sai <strong>20 natural</strong>, o golpe ignora a tabela de
+        efetividade normal e causa <strong>+1 bolinha de dano</strong> sobre o resultado que ele
+        já causaria (ex: um golpe neutro crítico causa 3 bolinhas; um Super Efetivo crítico causa
+        4). Golpes Super Fortes não recebem esse bônus — eles já são o teto de dano do sistema.
+        Um acerto crítico também <strong>ignora estágios de Evasão</strong>: o defensor não rola
+        o teste de esquiva descrito mais abaixo.
+      </p>
+
+      <!-- ESTÁGIOS DE STATUS -->
+      <h3 class="subsection-title">📊 Estágios de Status</h3>
+      <p class="regras-text">
+        Golpes que alteram o próprio usuário ou o oponente (ex: Swords Dance, Growl, Agility,
+        Sand Attack) não causam dano — eles alteram o <strong>estágio</strong> de um atributo:
+        Velocidade, Ataque, Defesa, Evasão ou Precisão. Cada atributo varia de
+        <strong>−6 a +6</strong>, começando em <strong>0</strong> no início do combate.
+      </p>
+      <p class="regras-text">
+        Use a descrição do golpe na Pokédex para saber quanto ele altera: a maioria dos golpes
+        move <strong>1 estágio</strong>; golpes mais fortes (como Swords Dance ou Amnesia) movem
+        <strong>2 estágios</strong> de uma vez. Não é necessário rolar dado para aplicar um boost
+        — ele funciona automaticamente ao acertar (ou, em golpes de auto-efeito, ao ser usado).
+      </p>
+      <div class="regra-grid">
+        <div class="regra-card">
+          <div class="regra-card-title">🐎 Velocidade</div>
+          <div class="regra-card-text">
+            Cada estágio de Velocidade altera a <strong>Classe de Armadura</strong> do Pokémon em
+            <strong>1 ponto</strong> por estágio (+1 CA por estágio positivo, −1 CA por estágio
+            negativo). Um Pokémon mais rápido é mais difícil de acertar.
+          </div>
+        </div>
+        <div class="regra-card">
+          <div class="regra-card-title">⚔️ Ataque</div>
+          <div class="regra-card-text">
+            A cada <strong>2 estágios</strong> de Ataque, os golpes desse Pokémon causam
+            <strong>+1 bolinha</strong> de dano (a cada 2 estágios negativos, −1 bolinha). Estágios
+            ímpares (1, 3, 5) ainda não concedem o bônus — ele só é aplicado a cada par completo.
+          </div>
+        </div>
+        <div class="regra-card">
+          <div class="regra-card-title">🛡️ Defesa</div>
+          <div class="regra-card-text">
+            A cada <strong>2 estágios</strong> de Defesa, o Pokémon recebe <strong>−1 bolinha</strong>
+            de dano por golpe sofrido (a cada 2 estágios negativos, +1 bolinha). O dano nunca pode
+            ser reduzido a 0 por esse efeito — o mínimo é sempre <strong>1 bolinha</strong>, exceto
+            quando o golpe já não causaria dano algum por imunidade de tipo (ex: Elétrico contra
+            Terrestre).
+          </div>
+        </div>
+        <div class="regra-card">
+          <div class="regra-card-title">👻 Evasão</div>
+          <div class="regra-card-text">
+            Quando um golpe acerta um Pokémon com estágios de Evasão, o defensor pode rolar
+            <strong>1d12</strong> contra dificuldade base <strong>12</strong> para tentar desviar.
+            Cada estágio de Evasão reduz essa dificuldade em <strong>1 ponto</strong>. Veja a regra
+            completa de Esquiva e Contra-Ataque logo abaixo.
+          </div>
+        </div>
+        <div class="regra-card">
+          <div class="regra-card-title">🔍 Precisão</div>
+          <div class="regra-card-text">
+            A Precisão do atacante neutraliza a Evasão do defensor: cada estágio de Precisão do
+            atacante <strong>aumenta em 1 ponto</strong> a dificuldade do teste de Esquiva do
+            defensor (tornando mais difícil para ele desviar).
+          </div>
+        </div>
+      </div>
+
+      <p class="regras-text">
+        <strong>Limite e duração:</strong> nenhum atributo pode passar de <strong>+6</strong> ou
+        <strong>−6</strong> — golpes que tentem ultrapassar esse teto simplesmente não têm efeito
+        adicional (mas o uso do golpe ainda conta como a ação do turno). Os estágios persistem
+        durante toda a batalha e só são zerados quando o Pokémon for trocado e voltar depois,
+        quando o combate termina ou por efeito específico de golpe/item que reseta status
+        (ex: Haze).
+      </p>
+
+      <h4 class="micro-title">🌀 Esquiva e Contra-Ataque</h4>
+      <p class="regras-text">
+        Esse teste só se aplica quando o defensor tem <strong>pelo menos 1 estágio de Evasão</strong>
+        acima de 0 — Pokémon em Evasão neutra não testam esquiva, o acerto é resolvido normalmente
+        pela CA. O teste acontece <strong>depois</strong> de o ataque já ter acertado a CA:
+      </p>
+      <ul class="regras-list">
+        <li>O defensor rola <strong>1d12</strong> contra dificuldade <strong>12 − estágios de
+        Evasão do defensor + estágios de Precisão do atacante</strong>.</li>
+        <li><strong>Sucesso</strong> (resultado ≥ dificuldade): o ataque é totalmente desviado —
+        nenhum dano é causado — <strong>e</strong> o defensor causa <strong>1 bolinha de dano</strong>
+        de contra-ataque no atacante, representando a abertura criada pela esquiva.</li>
+        <li><strong>Falha</strong>: o ataque acerta normalmente, aplicando dano e efeitos como de
+        costume.</li>
+        <li>A dificuldade desse teste tem piso de <strong>2</strong> (não pode ser reduzida abaixo
+        disso, mesmo com Evasão muito alta combinada a Precisão baixa).</li>
+      </ul>
+
+      <!-- CONDIÇÕES DE STATUS -->
+      <h3 class="subsection-title">🧪 Condições de Status</h3>
+      <p class="regras-text">
+        Vários golpes têm chance de aplicar uma condição além do dano normal. Quando um golpe diz
+        ter chance de causar uma condição, role <strong>1d20</strong> após confirmar o acerto: se o
+        resultado cair dentro da faixa abaixo, a condição é aplicada. As faixas seguem
+        aproximadamente as chances oficiais dos jogos, adaptadas para o d20.
+      </p>
+
+      <div class="cond-grid">
+
+        <div class="cond-card cond-BRN">
+          <div class="cond-card-head"><span class="cond-icon">🔥</span><span>Burn (Queimadura)</span></div>
+          <div class="cond-card-chance">Chance comum: golpe acerta + d20 ≥ 16 (~25%)</div>
+          <p class="regras-text">
+            O Pokémon queimado perde <strong>1 bolinha de vida</strong> no início de cada um dos
+            seus turnos, e seus golpes de contato físico causam <strong>1 bolinha a menos</strong>
+            de dano (mínimo de 1). A queimadura não passa sozinha: só termina com item, golpe de
+            cura de status ou troca para fora da batalha.
+          </p>
+        </div>
+
+        <div class="cond-card cond-FRZ">
+          <div class="cond-card-head"><span class="cond-icon">❄️</span><span>Freeze (Congelamento)</span></div>
+          <div class="cond-card-chance">Chance comum: golpe acerta + d20 ≥ 19 (~10%)</div>
+          <p class="regras-text">
+            O Pokémon congelado <strong>não pode agir</strong> em seu turno. No início de cada
+            turno seu, role 1d20: <strong>15+</strong> descongela (o Pokémon "quebra o gelo" e age
+            normalmente naquele turno). Um golpe do tipo <strong>Fogo</strong> que o atinja também
+            o descongela automaticamente, além de causar o dano normal.
+          </p>
+        </div>
+
+        <div class="cond-card cond-PAR">
+          <div class="cond-card-head"><span class="cond-icon">⚡</span><span>Paralysis (Paralisia)</span></div>
+          <div class="cond-card-chance">Chance comum: golpe acerta + d20 ≥ 14 (~35%)</div>
+          <p class="regras-text">
+            No início de cada turno do Pokémon paralisado, role 1d20: em um resultado de
+            <strong>1 a 5</strong>, ele trava e perde o turno por completo. Além disso, enquanto
+            paralisado, o Pokémon sempre age <strong>por último</strong> na ordem de turnos daquela
+            rodada, independente da sua Velocidade na Pokédex. A paralisia dura até ser curada por
+            item, golpe ou troca.
+          </p>
+        </div>
+
+        <div class="cond-card cond-PSN">
+          <div class="cond-card-head"><span class="cond-icon">🟣</span><span>Poison (Veneno)</span></div>
+          <div class="cond-card-chance">Chance comum: golpe acerta + d20 ≥ 17 (~20%)</div>
+          <p class="regras-text">
+            O Pokémon envenenado perde <strong>1 bolinha de vida</strong> no início de cada um dos
+            seus turnos, valor fixo que não aumenta com o tempo. Dura até ser curado por item,
+            golpe de cura de status ou troca para fora da batalha.
+          </p>
+        </div>
+
+        <div class="cond-card cond-TOX">
+          <div class="cond-card-head"><span class="cond-icon">💜</span><span>Bad Poison (Veneno Grave)</span></div>
+          <div class="cond-card-chance">Exclusivo de golpes/itens específicos (ex: Toxic) — sem chance, aplica direto ao acertar</div>
+          <p class="regras-text">
+            Versão mais perigosa do veneno: a perda de vida <strong>aumenta a cada turno</strong> —
+            1 bolinha no primeiro turno envenenado, 2 no segundo, e assim por diante (sem teto além
+            da vida restante do Pokémon). Trocar o Pokémon de batalha <strong>reseta a contagem</strong>
+            para 1 bolinha na próxima vez que o efeito ativar, mas a condição em si só termina com
+            cura específica (item ou golpe).
+          </p>
+        </div>
+
+        <div class="cond-card cond-SLP">
+          <div class="cond-card-head"><span class="cond-icon">💤</span><span>Sleep (Sono)</span></div>
+          <div class="cond-card-chance">Chance comum: golpe acerta + d20 ≥ 18 (~15%)</div>
+          <p class="regras-text">
+            O Pokémon adormecido não pode agir. Role <strong>1d4</strong> ao aplicar a condição:
+            esse é o número de turnos que ele permanece dormindo (mínimo garantido). Ao final
+            desses turnos, ele acorda automaticamente no início do turno seguinte. Um golpe que
+            cause dano direto não acorda o Pokémon antes da hora — só o tempo, item ou habilidade
+            específica encerram o sono mais cedo.
+          </p>
+        </div>
+
+      </div>
+
+      <p class="regras-text" style="margin-top:18px">
+        <strong>Acúmulo de condições:</strong> um Pokémon só pode estar sob <strong>uma condição
+        de status por vez</strong> (Burn, Freeze, Paralysis, Poison, Bad Poison ou Sleep são
+        mutuamente exclusivas) — assim como nos jogos. Se um golpe tentar aplicar uma nova condição
+        em um Pokémon que já tem outra, a tentativa simplesmente falha; o dano do golpe ainda é
+        aplicado normalmente.
       </p>
     </div>
   </div>

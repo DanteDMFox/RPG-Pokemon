@@ -260,15 +260,16 @@ function buildSlot(i) {
       </div>
 
       <div class="slot-level-row">
+        <div class="slot-field-label">❤️ Vida (9 bolinhas)</div>
+        <div class="hp-bubbles" id="hpBubbles${i}"></div>
+        <span class="hp-count" id="hpCount${i}">9 / 9</span>
+        <input type="hidden" name="hp${i}" id="pokemonHp${i}" value="9">
+      </div>
+
+      <div class="slot-level-row">
         <div class="slot-field-label">Level</div>
         <input type="number" name="level${i}" id="pokemonLevel${i}"
                placeholder="1" min="1" max="100" class="pokemon-level-input">
-        <div class="level-display">
-          <div class="level-bar-wrap">
-            <div class="level-bar-fill" id="levelBar${i}" style="width:1%"></div>
-          </div>
-          <span class="level-badge" id="levelBadge${i}">Lv.—</span>
-        </div>
         <div class="evo-row" id="evoRow${i}"></div>
       </div>
 
@@ -294,10 +295,13 @@ function attachSlotListeners(i) {
   const captureSel  = document.getElementById(`pokemonSelect${i}`);
 
   nameInput.addEventListener('input', () => updateSlotName(i));
-  levelInput.addEventListener('input', () => updateLevelBar(i));
+  levelInput.addEventListener('input', () => updateLevelDisplay(i));
   statusSel.addEventListener('change', () => updateStatusBadge(i));
   type1Sel.addEventListener('change', () => updateSlotColor(i));
   captureSel.addEventListener('change', () => fillFromPokedex(i));
+
+  buildHpBubbles(i);
+  renderHpBubbles(i);
 
   // also trigger on any change for autosave
   document.querySelectorAll(`#slot-${i} input, #slot-${i} select`).forEach(el => {
@@ -385,14 +389,11 @@ function updateSlotName(i) {
   label.textContent = val || 'Empty slot';
   const slot = document.getElementById(`slot-${i}`);
   slot.classList.toggle('has-pokemon', val.length > 0);
-  updateLevelBar(i);
+  updateEvoStages(i, parseInt(document.getElementById(`pokemonLevel${i}`).value) || 0);
 }
 
-function updateLevelBar(i) {
+function updateLevelDisplay(i) {
   const level = parseInt(document.getElementById(`pokemonLevel${i}`).value) || 0;
-  const capped = Math.min(100, Math.max(0, level));
-  document.getElementById(`levelBar${i}`).style.width = `${capped}%`;
-  document.getElementById(`levelBadge${i}`).textContent = level > 0 ? `Lv.${level}` : 'Lv.—';
   updateEvoStages(i, level);
 }
 
@@ -400,7 +401,8 @@ function updateLevelBar(i) {
 // shows milestone stages (<= 16, <= 36, <= 100)
 function updateEvoStages(i, level) {
   const evoRow = document.getElementById(`evoRow${i}`);
-  const name   = document.getElementById(`pokemonName${i}`).value.trim();
+  if (!evoRow) return;
+  const name = document.getElementById(`pokemonName${i}`).value.trim();
   if (!name || !level) { evoRow.innerHTML = ''; return; }
 
   const stages = [
@@ -415,6 +417,72 @@ function updateEvoStages(i, level) {
     else if (level >= s.min) cls = 'next';
     return `<span class="evo-stage ${cls}">${cls === 'achieved' ? '✓ ' : cls === 'next' ? '▶ ' : ''}${s.label}</span>`;
   }).join('');
+}
+
+// ---- VIDA (9 BOLINHAS) ----
+const HP_MAX = 9;
+
+function buildHpBubbles(i) {
+  const container = document.getElementById(`hpBubbles${i}`);
+  if (!container) return;
+  let html = '';
+  for (let n = 1; n <= HP_MAX; n++) {
+    html += `<span class="hp-bubble" data-n="${n}" title="Bolinha ${n}"></span>`;
+  }
+  container.innerHTML = html;
+
+  container.querySelectorAll('.hp-bubble').forEach(bubble => {
+    bubble.addEventListener('click', () => onHpBubbleClick(i, parseInt(bubble.dataset.n)));
+  });
+}
+
+function onHpBubbleClick(i, n) {
+  const hidden  = document.getElementById(`pokemonHp${i}`);
+  const current = parseInt(hidden.value);
+
+  // Clicar numa bolinha cheia apaga ela (e tudo à direita fica vida perdida).
+  // Clicar numa bolinha já apagada restaura a vida até ali.
+  let next;
+  if (n <= current) {
+    next = n - 1; // perde vida: fica com (n-1) bolinhas acesas
+  } else {
+    next = n; // restaura vida até a bolinha clicada
+  }
+  setHp(i, next);
+  salvarDados();
+}
+
+function setHp(i, value) {
+  const clamped = Math.max(0, Math.min(HP_MAX, value));
+  const hidden  = document.getElementById(`pokemonHp${i}`);
+  hidden.value  = clamped;
+  renderHpBubbles(i);
+}
+
+function renderHpBubbles(i) {
+  const hidden = document.getElementById(`pokemonHp${i}`);
+  if (!hidden) return;
+  const current = parseInt(hidden.value);
+  const count   = document.getElementById(`hpCount${i}`);
+  const slot    = document.getElementById(`slot-${i}`);
+
+  document.querySelectorAll(`#hpBubbles${i} .hp-bubble`).forEach(bubble => {
+    const n = parseInt(bubble.dataset.n);
+    bubble.classList.toggle('filled', n <= current);
+  });
+
+  if (count) count.textContent = `${current} / ${HP_MAX}`;
+
+  // Reflete vida 0 no badge de status (Fainted), sem sobrescrever outras condições manuais
+  const statusSel = document.getElementById(`pokemonStatus${i}`);
+  if (slot) slot.classList.toggle('fainted', current === 0);
+  if (current === 0 && statusSel && statusSel.value !== 'FNT') {
+    statusSel.value = 'FNT';
+    updateStatusBadge(i);
+  } else if (current > 0 && statusSel && statusSel.value === 'FNT') {
+    statusSel.value = '';
+    updateStatusBadge(i);
+  }
 }
 
 function updateStatusBadge(i) {
@@ -527,9 +595,10 @@ function carregarDados() {
   // Re-trigger visual updates
   for (let i = 1; i <= 6; i++) {
     updateSlotName(i);
-    updateLevelBar(i);
+    updateLevelDisplay(i);
     updateStatusBadge(i);
     updateSlotColor(i);
+    renderHpBubbles(i);
   }
 }
 
@@ -566,9 +635,10 @@ form.addEventListener('reset', () => {
   setTimeout(() => {
     for (let i = 1; i <= 6; i++) {
       updateSlotName(i);
-      updateLevelBar(i);
+      updateLevelDisplay(i);
       updateStatusBadge(i);
       updateSlotColor(i);
+      setHp(i, HP_MAX); // reset reinicia vida pra 9/9
     }
     mostrarNotificacao('🔄 Campos limpos!', 'aviso');
   }, 10);
