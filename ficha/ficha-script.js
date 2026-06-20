@@ -31,6 +31,10 @@ const TYPE_COLORS = {
 // ---- CAPTURED POKÉMON (lido do mesmo localStorage usado pela Pokédex) ----
 let capturedList = []; // [{id, name}]
 
+// ---- ESTADO: quem está em cada slot da party (fonte de verdade) ----
+// { 1: "25", 2: null, 3: "1", ... }
+let partyAssignments = { 1: null, 2: null, 3: null, 4: null, 5: null, 6: null };
+
 function loadCapturedList() {
   const raw = localStorage.getItem('pokemonCapturados');
   if (!raw) { capturedList = []; return; }
@@ -75,6 +79,18 @@ async function ensureCapturedNames() {
 // ---- BUILD PARTY SLOTS ----
 async function buildPartySlots() {
   loadCapturedList();
+  carregarPartyAssignments();
+
+  // Sanidade: se um pokémon salvo num slot não está mais na lista de capturados
+  // (ex: foi liberado na Pokédex), limpa a alocação.
+  const capturedIds = new Set(capturedList.map(p => String(p.id)));
+  for (let i = 1; i <= 6; i++) {
+    if (partyAssignments[i] && !capturedIds.has(String(partyAssignments[i]))) {
+      partyAssignments[i] = null;
+    }
+  }
+  salvarPartyAssignments();
+
   const container = document.getElementById('partySlots');
   const grid = document.createElement('div');
   grid.className = 'pokemon-party-grid';
@@ -94,24 +110,92 @@ async function buildPartySlots() {
   if (capturedList.length) {
     await ensureCapturedNames();
     populateCapturedDropdowns(); // re-popula já com nomes carregados
+
+    // Restaura visualmente (nome/tipo/sprite) os slots que já tinham um pokémon alocado
+    for (let i = 1; i <= 6; i++) {
+      if (partyAssignments[i]) await restoreSlotVisuals(i, partyAssignments[i]);
+    }
   }
+}
+
+// Restaura nome/tipo/sprite de um slot a partir do id já alocado, sem mexer no estado de ocupação
+async function restoreSlotVisuals(i, id) {
+  const cache = loadNameCache();
+  document.getElementById(`pokemonDexId${i}`).value = id;
+
+  const sel = document.getElementById(`pokemonSelect${i}`);
+  if (sel) sel.value = String(id);
+
+  const sprite = document.getElementById(`slotSprite${i}`);
+  if (sprite) {
+    sprite.src = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${id}.png`;
+    sprite.style.display = 'inline-block';
+  }
+
+  // Se o nome/tipo ainda não foram preenchidos manualmente, busca pra exibir
+  const nameInput = document.getElementById(`pokemonName${i}`);
+  if (nameInput && !nameInput.value && cache[id]) {
+    nameInput.value = capitalize(cache[id]);
+    updateSlotName(i);
+  }
+}
+
+function getOccupiedIds(excludeSlot = null) {
+  const set = new Set();
+  Object.entries(partyAssignments).forEach(([slot, id]) => {
+    if (id && Number(slot) !== Number(excludeSlot)) set.add(String(id));
+  });
+  return set;
 }
 
 function populateCapturedDropdowns() {
   for (let i = 1; i <= 6; i++) {
     const sel = document.getElementById(`pokemonSelect${i}`);
     if (!sel) continue;
-    const currentVal = sel.value;
 
-    const options = capturedList.map(p =>
+    const occupied   = getOccupiedIds(i); // ignora o próprio slot
+    const available  = capturedList.filter(p => !occupied.has(String(p.id)));
+    const currentVal = partyAssignments[i] ? String(partyAssignments[i]) : '';
+
+    const options = available.map(p =>
       `<option value="${p.id}">#${String(p.id).padStart(3,'0')} ${p.name ? capitalize(p.name) : '...'}</option>`
     ).join('');
 
     sel.innerHTML = `<option value="">${capturedList.length ? '— Selecione um capturado —' : '— Nenhum Pokémon capturado ainda —'}</option>${options}`;
     sel.disabled = capturedList.length === 0;
-
-    if (currentVal) sel.value = currentVal;
+    sel.value = currentVal;
   }
+  renderFarm();
+}
+
+// ---- FARM: capturados que não estão em nenhum slot ----
+function renderFarm() {
+  const container = document.getElementById('farmList');
+  if (!container) return;
+
+  const occupied  = getOccupiedIds();
+  const farmMons  = capturedList.filter(p => !occupied.has(String(p.id)));
+
+  if (!capturedList.length) {
+    container.innerHTML = `<p class="farm-empty">Nenhum Pokémon capturado ainda. Capture na Pokédex para vê-los aparecer aqui.</p>`;
+    return;
+  }
+
+  if (!farmMons.length) {
+    container.innerHTML = `<p class="farm-empty">Todos os seus Pokémon capturados estão na party! 🎉</p>`;
+    return;
+  }
+
+  container.innerHTML = farmMons.map(p => {
+    const img = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${p.id}.png`;
+    return `
+      <div class="farm-card" data-id="${p.id}">
+        <img src="${img}" alt="${p.name || ''}" loading="lazy">
+        <div class="farm-card-num">#${String(p.id).padStart(3,'0')}</div>
+        <div class="farm-card-name">${p.name ? capitalize(p.name) : '...'}</div>
+      </div>
+    `;
+  }).join('');
 }
 
 function capitalize(s) {
@@ -230,7 +314,10 @@ async function fillFromPokedex(i) {
 
   if (!id) {
     document.getElementById(`pokemonDexId${i}`).value = '';
+    partyAssignments[i] = null;
     hint.textContent = '';
+    populateCapturedDropdowns(); // libera o antigo pra farm/outros slots
+    salvarPartyAssignments();
     return;
   }
 
@@ -252,6 +339,10 @@ async function fillFromPokedex(i) {
     // ID do pokédex (guardado em campo hidden, útil para referência futura)
     document.getElementById(`pokemonDexId${i}`).value = id;
 
+    // Atualiza estado de ocupação (libera o slot do valor antigo automaticamente)
+    partyAssignments[i] = String(id);
+    salvarPartyAssignments();
+
     // Sprite no header do slot
     const sprite = document.getElementById(`slotSprite${i}`);
     const imgSrc = data.sprites?.front_default
@@ -262,6 +353,7 @@ async function fillFromPokedex(i) {
     // Atualiza visuais dependentes
     updateSlotName(i);
     updateSlotColor(i);
+    populateCapturedDropdowns(); // remove esse pokémon dos outros dropdowns + atualiza farm
     salvarDados();
 
     hint.textContent = `✅ Dados carregados de #${String(id).padStart(3,'0')} ${capitalize(data.name)}`;
@@ -269,6 +361,22 @@ async function fillFromPokedex(i) {
     console.error('Erro ao buscar Pokémon da Pokédex:', err);
     hint.textContent = '❌ Erro ao buscar dados. Tente novamente.';
   }
+}
+
+// ---- Persistência das alocações da party (separado do localStorage da ficha em si,
+//      pra não depender da serialização do FormData) ----
+function salvarPartyAssignments() {
+  localStorage.setItem('fichaPartyAssignments', JSON.stringify(partyAssignments));
+}
+function carregarPartyAssignments() {
+  const raw = localStorage.getItem('fichaPartyAssignments');
+  if (!raw) return;
+  try {
+    const saved = JSON.parse(raw);
+    for (let i = 1; i <= 6; i++) {
+      partyAssignments[i] = saved[i] || null;
+    }
+  } catch { /* ignore */ }
 }
 
 function updateSlotName(i) {
@@ -422,18 +530,6 @@ function carregarDados() {
     updateLevelBar(i);
     updateStatusBadge(i);
     updateSlotColor(i);
-
-    // Restaura sprite e dropdown se já havia um pokémon do dex selecionado
-    const dexId = document.getElementById(`pokemonDexId${i}`)?.value;
-    if (dexId) {
-      const sel = document.getElementById(`pokemonSelect${i}`);
-      if (sel) sel.value = dexId;
-      const sprite = document.getElementById(`slotSprite${i}`);
-      if (sprite) {
-        sprite.src = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${dexId}.png`;
-        sprite.style.display = 'inline-block';
-      }
-    }
   }
 }
 
@@ -486,5 +582,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   await buildPartySlots();
   initFotoUpload();
   carregarDados();
+  populateCapturedDropdowns(); // garante que os selects refletem o estado final pós-carregarDados
   console.log('🔴⚪ Ficha de Pokémon carregada!');
 });
