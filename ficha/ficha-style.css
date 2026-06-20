@@ -120,6 +120,37 @@
   text-transform: capitalize;
 }
 
+.slot-sprite {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+  image-rendering: pixelated;
+  flex-shrink: 0;
+}
+
+/* ---- Dropdown de Pokémon capturados ---- */
+.pokemon-select-captured {
+  width: 100%;
+  padding: 9px 12px;
+  font-size: 0.85rem;
+  border: 2px solid rgba(248,208,48,0.3);
+  background: rgba(248,208,48,0.06);
+}
+.pokemon-select-captured:hover {
+  border-color: rgba(248,208,48,0.55);
+}
+.pokemon-select-captured:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.select-hint {
+  font-size: 0.7rem;
+  color: var(--text-gray);
+  margin-top: 5px;
+  min-height: 14px;
+}
+
 .slot-fields {
   display: grid;
   grid-template-columns: 1fr 1fr;

@@ -28,8 +28,53 @@ const TYPE_COLORS = {
   Steel:'#B8B8D0', Fairy:'#EE99AC'
 };
 
+// ---- CAPTURED POKÉMON (lido do mesmo localStorage usado pela Pokédex) ----
+let capturedList = []; // [{id, name}]
+
+function loadCapturedList() {
+  const raw = localStorage.getItem('pokemonCapturados');
+  if (!raw) { capturedList = []; return; }
+  try {
+    const ids = JSON.parse(raw);
+    capturedList = [...ids].sort((a, b) => a - b).map(id => ({ id, name: null }));
+  } catch {
+    capturedList = [];
+  }
+}
+
+// Cache de nomes (id -> nome) para não martelar a PokeAPI toda hora
+const POKEMON_NAME_CACHE_KEY = 'pokemonNameCache';
+function loadNameCache() {
+  try { return JSON.parse(localStorage.getItem(POKEMON_NAME_CACHE_KEY)) || {}; }
+  catch { return {}; }
+}
+function saveNameCache(cache) {
+  localStorage.setItem(POKEMON_NAME_CACHE_KEY, JSON.stringify(cache));
+}
+
+async function ensureCapturedNames() {
+  const cache = loadNameCache();
+  const missing = capturedList.filter(p => !cache[p.id]);
+
+  if (missing.length) {
+    await Promise.all(missing.map(async (p) => {
+      try {
+        const res  = await fetch(`https://pokeapi.co/api/v2/pokemon/${p.id}`);
+        const data = await res.json();
+        cache[p.id] = data.name;
+      } catch {
+        cache[p.id] = `#${p.id}`;
+      }
+    }));
+    saveNameCache(cache);
+  }
+
+  capturedList.forEach(p => { p.name = cache[p.id] || `#${p.id}`; });
+}
+
 // ---- BUILD PARTY SLOTS ----
-function buildPartySlots() {
+async function buildPartySlots() {
+  loadCapturedList();
   const container = document.getElementById('partySlots');
   const grid = document.createElement('div');
   grid.className = 'pokemon-party-grid';
@@ -43,6 +88,34 @@ function buildPartySlots() {
   for (let i = 1; i <= 6; i++) {
     attachSlotListeners(i);
   }
+
+  // popula os dropdowns (nomes podem chegar um pouco depois, via PokeAPI)
+  populateCapturedDropdowns();
+  if (capturedList.length) {
+    await ensureCapturedNames();
+    populateCapturedDropdowns(); // re-popula já com nomes carregados
+  }
+}
+
+function populateCapturedDropdowns() {
+  for (let i = 1; i <= 6; i++) {
+    const sel = document.getElementById(`pokemonSelect${i}`);
+    if (!sel) continue;
+    const currentVal = sel.value;
+
+    const options = capturedList.map(p =>
+      `<option value="${p.id}">#${String(p.id).padStart(3,'0')} ${p.name ? capitalize(p.name) : '...'}</option>`
+    ).join('');
+
+    sel.innerHTML = `<option value="">${capturedList.length ? '— Selecione um capturado —' : '— Nenhum Pokémon capturado ainda —'}</option>${options}`;
+    sel.disabled = capturedList.length === 0;
+
+    if (currentVal) sel.value = currentVal;
+  }
+}
+
+function capitalize(s) {
+  return s.charAt(0).toUpperCase() + s.slice(1);
 }
 
 function buildSlot(i) {
@@ -62,10 +135,20 @@ function buildSlot(i) {
   div.innerHTML = `
     <div class="slot-header">
       <span class="slot-number">${nums[i-1]}</span>
+      <img class="slot-sprite" id="slotSprite${i}" style="display:none" alt="">
       <span class="slot-name" id="slotName${i}">Empty slot</span>
     </div>
+    <input type="hidden" name="pokedexId${i}" id="pokemonDexId${i}">
 
     <div class="slot-fields">
+      <div class="slot-level-row">
+        <div class="slot-field-label">🔴 Escolher da Pokédex (capturados)</div>
+        <select id="pokemonSelect${i}" class="pokemon-select-captured">
+          <option value="">— Nenhum Pokémon capturado ainda —</option>
+        </select>
+        <div class="select-hint" id="selectHint${i}"></div>
+      </div>
+
       <div>
         <div class="slot-field-label">Name</div>
         <input type="text" name="pokemon${i}" id="pokemonName${i}"
@@ -124,17 +207,68 @@ function attachSlotListeners(i) {
   const levelInput  = document.getElementById(`pokemonLevel${i}`);
   const statusSel   = document.getElementById(`pokemonStatus${i}`);
   const type1Sel    = document.getElementById(`pokemonType1_${i}`);
+  const captureSel  = document.getElementById(`pokemonSelect${i}`);
 
   nameInput.addEventListener('input', () => updateSlotName(i));
   levelInput.addEventListener('input', () => updateLevelBar(i));
   statusSel.addEventListener('change', () => updateStatusBadge(i));
   type1Sel.addEventListener('change', () => updateSlotColor(i));
+  captureSel.addEventListener('change', () => fillFromPokedex(i));
 
   // also trigger on any change for autosave
   document.querySelectorAll(`#slot-${i} input, #slot-${i} select`).forEach(el => {
     el.addEventListener('change', salvarDados);
     el.addEventListener('input', salvarDados);
   });
+}
+
+// ---- AUTO-FILL a partir do Pokémon selecionado no dropdown (capturados) ----
+async function fillFromPokedex(i) {
+  const sel  = document.getElementById(`pokemonSelect${i}`);
+  const hint = document.getElementById(`selectHint${i}`);
+  const id   = sel.value;
+
+  if (!id) {
+    document.getElementById(`pokemonDexId${i}`).value = '';
+    hint.textContent = '';
+    return;
+  }
+
+  hint.textContent = '⏳ Buscando dados na Pokédex...';
+
+  try {
+    const res  = await fetch(`https://pokeapi.co/api/v2/pokemon/${id}`);
+    const data = await res.json();
+
+    // Nome
+    const nameInput = document.getElementById(`pokemonName${i}`);
+    nameInput.value = capitalize(data.name);
+
+    // Tipos
+    const types = data.types.map(t => capitalize(t.type.name));
+    document.getElementById(`pokemonType1_${i}`).value = types[0] || '';
+    document.getElementById(`pokemonType2_${i}`).value = types[1] || '';
+
+    // ID do pokédex (guardado em campo hidden, útil para referência futura)
+    document.getElementById(`pokemonDexId${i}`).value = id;
+
+    // Sprite no header do slot
+    const sprite = document.getElementById(`slotSprite${i}`);
+    const imgSrc = data.sprites?.front_default
+                || `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${id}.png`;
+    sprite.src = imgSrc;
+    sprite.style.display = 'inline-block';
+
+    // Atualiza visuais dependentes
+    updateSlotName(i);
+    updateSlotColor(i);
+    salvarDados();
+
+    hint.textContent = `✅ Dados carregados de #${String(id).padStart(3,'0')} ${capitalize(data.name)}`;
+  } catch (err) {
+    console.error('Erro ao buscar Pokémon da Pokédex:', err);
+    hint.textContent = '❌ Erro ao buscar dados. Tente novamente.';
+  }
 }
 
 function updateSlotName(i) {
@@ -288,6 +422,18 @@ function carregarDados() {
     updateLevelBar(i);
     updateStatusBadge(i);
     updateSlotColor(i);
+
+    // Restaura sprite e dropdown se já havia um pokémon do dex selecionado
+    const dexId = document.getElementById(`pokemonDexId${i}`)?.value;
+    if (dexId) {
+      const sel = document.getElementById(`pokemonSelect${i}`);
+      if (sel) sel.value = dexId;
+      const sprite = document.getElementById(`slotSprite${i}`);
+      if (sprite) {
+        sprite.src = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${dexId}.png`;
+        sprite.style.display = 'inline-block';
+      }
+    }
   }
 }
 
@@ -336,8 +482,8 @@ form.addEventListener('reset', () => {
 form.addEventListener('change', salvarDados);
 
 // ---- INIT ----
-document.addEventListener('DOMContentLoaded', () => {
-  buildPartySlots();
+document.addEventListener('DOMContentLoaded', async () => {
+  await buildPartySlots();
   initFotoUpload();
   carregarDados();
   console.log('🔴⚪ Ficha de Pokémon carregada!');
