@@ -20,6 +20,15 @@ const STATUS_CONDITIONS = [
   { value: 'FNT', label: '💀 Fainted',    cls: 'FNT'  },
 ];
 
+// Estágios de batalha rastreados na ficha: -6 a +6, reiniciam em 0
+const STAGE_ATTRS = [
+  { key: 'atk', label: '⚔️ Ataque',    short: 'ATK' },
+  { key: 'def', label: '🛡️ Defesa',    short: 'DEF' },
+  { key: 'spd', label: '🐎 Velocidade', short: 'SPD' },
+  { key: 'eva', label: '👻 Evasão',     short: 'EVA' },
+  { key: 'acc', label: '🔍 Precisão',   short: 'ACC' },
+];
+
 const TYPE_COLORS = {
   Normal:'#A8A878', Fire:'#F08030', Water:'#6890F0', Electric:'#F8D030',
   Grass:'#78C850', Ice:'#98D8D8', Fighting:'#C03028', Poison:'#A040A0',
@@ -218,9 +227,11 @@ function buildSlot(i) {
   div.id = `slot-${i}`;
   div.innerHTML = `
     <div class="slot-header">
-      <span class="slot-number">${nums[i-1]}</span>
       <img class="slot-sprite" id="slotSprite${i}" style="display:none" alt="">
-      <span class="slot-name" id="slotName${i}">Empty slot</span>
+      <div class="slot-header-text">
+        <span class="slot-number">${nums[i-1]}</span>
+        <span class="slot-name" id="slotName${i}">Empty slot</span>
+      </div>
     </div>
     <input type="hidden" name="pokedexId${i}" id="pokemonDexId${i}">
 
@@ -260,27 +271,29 @@ function buildSlot(i) {
       </div>
 
       <div class="slot-level-row">
-        <div class="slot-field-label">❤️ Vida (9 bolinhas)</div>
+        <div class="slot-field-label">❤️ Vida</div>
         <div class="hp-bubbles" id="hpBubbles${i}"></div>
         <span class="hp-count" id="hpCount${i}">9 / 9</span>
         <input type="hidden" name="hp${i}" id="pokemonHp${i}" value="9">
       </div>
 
       <div class="slot-level-row">
-        <div class="slot-field-label">Level</div>
-        <input type="number" name="level${i}" id="pokemonLevel${i}"
-               placeholder="1" min="1" max="100" class="pokemon-level-input">
+        <div class="slot-field-label">🧬 Estágio Evolutivo</div>
         <div class="evo-row" id="evoRow${i}"></div>
+        <input type="hidden" name="evoStage${i}" id="pokemonEvoStage${i}" value="1">
       </div>
 
-      <div class="slot-level-row" style="margin-top:10px">
-        <div class="slot-field-label">Status Condition</div>
+      <div class="slot-level-row">
+        <div class="slot-field-label">Status</div>
         <select name="status${i}" id="pokemonStatus${i}" class="pokemon-status-select">
           ${statusOptions}
         </select>
-        <div style="margin-top:6px">
-          <span class="status-badge none" id="statusBadge${i}">✅ Healthy</span>
-        </div>
+        <span class="status-badge none" id="statusBadge${i}">✅ Healthy</span>
+      </div>
+
+      <div class="slot-level-row stage-block">
+        <div class="slot-field-label">📊 Estágios de Batalha</div>
+        <div class="stage-tracker-grid" id="stageTracker${i}"></div>
       </div>
     </div>
   `;
@@ -288,20 +301,23 @@ function buildSlot(i) {
 }
 
 function attachSlotListeners(i) {
-  const nameInput   = document.getElementById(`pokemonName${i}`);
-  const levelInput  = document.getElementById(`pokemonLevel${i}`);
-  const statusSel   = document.getElementById(`pokemonStatus${i}`);
-  const type1Sel    = document.getElementById(`pokemonType1_${i}`);
-  const captureSel  = document.getElementById(`pokemonSelect${i}`);
+  const nameInput     = document.getElementById(`pokemonName${i}`);
+  const nicknameInput = document.getElementById(`pokemonNickname${i}`);
+  const statusSel     = document.getElementById(`pokemonStatus${i}`);
+  const type1Sel      = document.getElementById(`pokemonType1_${i}`);
+  const captureSel    = document.getElementById(`pokemonSelect${i}`);
 
   nameInput.addEventListener('input', () => updateSlotName(i));
-  levelInput.addEventListener('input', () => updateLevelDisplay(i));
+  nicknameInput.addEventListener('input', () => updateSlotName(i));
   statusSel.addEventListener('change', () => updateStatusBadge(i));
   type1Sel.addEventListener('change', () => updateSlotColor(i));
   captureSel.addEventListener('change', () => fillFromPokedex(i));
 
   buildHpBubbles(i);
   renderHpBubbles(i);
+  buildEvoStageSelector(i);
+  buildStageTracker(i);
+  renderAllStages(i);
 
   // also trigger on any change for autosave
   document.querySelectorAll(`#slot-${i} input, #slot-${i} select`).forEach(el => {
@@ -384,39 +400,57 @@ function carregarPartyAssignments() {
 }
 
 function updateSlotName(i) {
-  const val = document.getElementById(`pokemonName${i}`).value.trim();
-  const label = document.getElementById(`slotName${i}`);
-  label.textContent = val || 'Empty slot';
+  const name     = document.getElementById(`pokemonName${i}`).value.trim();
+  const nickname = document.getElementById(`pokemonNickname${i}`).value.trim();
+  const label    = document.getElementById(`slotName${i}`);
+
+  // Apelido tem prioridade sobre o nome do Pokémon quando preenchido
+  const displayVal = nickname || name;
+  label.textContent = displayVal || 'Empty slot';
+
   const slot = document.getElementById(`slot-${i}`);
-  slot.classList.toggle('has-pokemon', val.length > 0);
-  updateEvoStages(i, parseInt(document.getElementById(`pokemonLevel${i}`).value) || 0);
+  slot.classList.toggle('has-pokemon', name.length > 0);
 }
 
-function updateLevelDisplay(i) {
-  const level = parseInt(document.getElementById(`pokemonLevel${i}`).value) || 0;
-  updateEvoStages(i, level);
-}
+// ---- ESTÁGIO EVOLUTIVO (marcado manualmente: Base Form / Stage 2 / Stage 3) ----
+const EVO_STAGES = [
+  { n: 1, label: 'Base Form' },
+  { n: 2, label: 'Stage 2'   },
+  { n: 3, label: 'Stage 3'   },
+];
 
-// Very simplified evolution bands — the "narrative" approach:
-// shows milestone stages (<= 16, <= 36, <= 100)
-function updateEvoStages(i, level) {
+function buildEvoStageSelector(i) {
   const evoRow = document.getElementById(`evoRow${i}`);
   if (!evoRow) return;
-  const name = document.getElementById(`pokemonName${i}`).value.trim();
-  if (!name || !level) { evoRow.innerHTML = ''; return; }
 
-  const stages = [
-    { label: 'Base Form',  min: 0,  max: 15  },
-    { label: 'Stage 2',   min: 16, max: 35  },
-    { label: 'Stage 3',   min: 36, max: 100 },
-  ];
+  evoRow.innerHTML = EVO_STAGES.map(s =>
+    `<span class="evo-stage" data-stage="${s.n}">${s.label}</span>`
+  ).join('');
 
-  evoRow.innerHTML = stages.map(s => {
-    let cls = 'future';
-    if (level > s.max) cls = 'achieved';
-    else if (level >= s.min) cls = 'next';
-    return `<span class="evo-stage ${cls}">${cls === 'achieved' ? '✓ ' : cls === 'next' ? '▶ ' : ''}${s.label}</span>`;
-  }).join('');
+  evoRow.querySelectorAll('.evo-stage').forEach(badge => {
+    badge.addEventListener('click', () => {
+      setEvoStage(i, parseInt(badge.dataset.stage));
+      salvarDados();
+    });
+  });
+}
+
+function setEvoStage(i, stage) {
+  const hidden = document.getElementById(`pokemonEvoStage${i}`);
+  if (hidden) hidden.value = stage;
+  renderEvoStage(i);
+}
+
+function renderEvoStage(i) {
+  const hidden = document.getElementById(`pokemonEvoStage${i}`);
+  if (!hidden) return;
+  const current = parseInt(hidden.value) || 1;
+
+  document.querySelectorAll(`#evoRow${i} .evo-stage`).forEach(badge => {
+    const n = parseInt(badge.dataset.stage);
+    badge.classList.toggle('achieved', n === current);
+    badge.classList.toggle('future', n !== current);
+  });
 }
 
 // ---- VIDA (9 BOLINHAS) ----
@@ -491,6 +525,89 @@ function updateStatusBadge(i) {
   const found = STATUS_CONDITIONS.find(s => s.value === sel.value) || STATUS_CONDITIONS[0];
   badge.className = `status-badge ${found.cls}`;
   badge.textContent = found.label;
+}
+
+// ---- ESTÁGIOS DE BATALHA (Ataque, Defesa, Velocidade, Evasão, Precisão: -6 a +6) ----
+function buildStageTracker(i) {
+  const container = document.getElementById(`stageTracker${i}`);
+  if (!container) return;
+
+  container.innerHTML = STAGE_ATTRS.map(attr => `
+    <div class="stage-row" data-attr="${attr.key}">
+      <span class="stage-row-label">${attr.label}</span>
+      <div class="stage-pips" id="stagePips${i}_${attr.key}">
+        ${buildPipsHTML(i, attr.key)}
+      </div>
+      <input type="hidden" name="stage_${attr.key}_${i}" id="stageVal${i}_${attr.key}" value="0">
+      <span class="stage-value" id="stageValLabel${i}_${attr.key}">0</span>
+    </div>
+  `).join('');
+
+  // Listeners dos pips + botão de reset
+  STAGE_ATTRS.forEach(attr => {
+    container.querySelectorAll(`#stagePips${i}_${attr.key} .stage-pip`).forEach(pip => {
+      pip.addEventListener('click', () => onStagePipClick(i, attr.key, parseInt(pip.dataset.n)));
+    });
+  });
+}
+
+function buildPipsHTML(i, key) {
+  // 12 pips: 6 negativos (esquerda) + 6 positivos (direita), centrados em 0
+  let html = '';
+  for (let n = -6; n <= 6; n++) {
+    if (n === 0) {
+      html += `<span class="stage-zero-marker" title="Neutro (0)"></span>`;
+      continue;
+    }
+    const side = n < 0 ? 'neg' : 'pos';
+    html += `<span class="stage-pip ${side}" data-n="${n}" title="${n > 0 ? '+' + n : n}"></span>`;
+  }
+  return html;
+}
+
+function onStagePipClick(i, key, n) {
+  const hidden  = document.getElementById(`stageVal${i}_${key}`);
+  const current = parseInt(hidden.value) || 0;
+
+  // Clicar no mesmo estágio já ativo zera (volta pro neutro).
+  // Caso contrário, define o estágio clicado.
+  const next = (current === n) ? 0 : n;
+  setStage(i, key, next);
+  salvarDados();
+}
+
+function setStage(i, key, value) {
+  const clamped = Math.max(-6, Math.min(6, value));
+  const hidden  = document.getElementById(`stageVal${i}_${key}`);
+  if (hidden) hidden.value = clamped;
+  renderStage(i, key);
+}
+
+function renderStage(i, key) {
+  const hidden = document.getElementById(`stageVal${i}_${key}`);
+  if (!hidden) return;
+  const current = parseInt(hidden.value) || 0;
+
+  document.querySelectorAll(`#stagePips${i}_${key} .stage-pip`).forEach(pip => {
+    const n = parseInt(pip.dataset.n);
+    const filled = current >= 0 ? (n > 0 && n <= current) : (n < 0 && n >= current);
+    pip.classList.toggle('filled', filled);
+  });
+
+  const label = document.getElementById(`stageValLabel${i}_${key}`);
+  if (label) {
+    label.textContent = current > 0 ? `+${current}` : `${current}`;
+    label.classList.toggle('positive', current > 0);
+    label.classList.toggle('negative', current < 0);
+  }
+}
+
+function renderAllStages(i) {
+  STAGE_ATTRS.forEach(attr => renderStage(i, attr.key));
+}
+
+function resetAllStages(i) {
+  STAGE_ATTRS.forEach(attr => setStage(i, attr.key, 0));
 }
 
 function updateSlotColor(i) {
@@ -595,10 +712,11 @@ function carregarDados() {
   // Re-trigger visual updates
   for (let i = 1; i <= 6; i++) {
     updateSlotName(i);
-    updateLevelDisplay(i);
+    renderEvoStage(i);
     updateStatusBadge(i);
     updateSlotColor(i);
     renderHpBubbles(i);
+    renderAllStages(i);
   }
 }
 
@@ -635,10 +753,11 @@ form.addEventListener('reset', () => {
   setTimeout(() => {
     for (let i = 1; i <= 6; i++) {
       updateSlotName(i);
-      updateLevelDisplay(i);
+      setEvoStage(i, 1); // reset volta pro estágio Base Form
       updateStatusBadge(i);
       updateSlotColor(i);
       setHp(i, HP_MAX); // reset reinicia vida pra 9/9
+      resetAllStages(i); // reset reinicia estágios pra 0
     }
     mostrarNotificacao('🔄 Campos limpos!', 'aviso');
   }, 10);

@@ -38,6 +38,34 @@
       margin: 10px 0 4px;
     }
 
+    /* ---- NOTA DE ESCLARECIMENTO (escopo de cada estágio) ---- */
+    .nota-escopo {
+      background: rgba(90,109,224,0.08);
+      border: 2px solid rgba(90,109,224,0.25);
+      border-left: 4px solid var(--pokeblue-lite);
+      border-radius: var(--radius-md);
+      padding: 14px 16px;
+      margin: 14px 0 18px;
+    }
+    .nota-escopo-title {
+      font-weight: 800;
+      font-size: 0.82rem;
+      color: var(--pokeblue-lite);
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .nota-escopo-list {
+      margin: 0;
+      padding-left: 18px;
+      color: var(--text-offwhite);
+      font-size: 0.82rem;
+      line-height: 1.65;
+    }
+    .nota-escopo-list li { margin-bottom: 5px; }
+    .nota-escopo-list li:last-child { margin-bottom: 0; }
+
     /* ---- CHIPS (sinergia/desarmonia exemplos) ---- */
     .chip-row {
       display: flex;
@@ -439,6 +467,64 @@
         </div>
       </div>
 
+      <!-- GOLPES CONHECIDOS -->
+      <h3 class="subsection-title">📘 Quais Golpes o Pokémon Conhece</h3>
+      <p class="regras-text">
+        Um Pokémon sabe, em qualquer momento, <strong>todos os golpes de level-up do seu estágio
+        evolutivo atual e de todos os estágios anteriores</strong> da sua linha — desde que o
+        level de aprendizado do golpe (mostrado na Pokédex) seja menor ou igual ao seu level
+        <strong>no estágio em que ele aprenderia o golpe</strong>. Não há limite de 4 golpes:
+        o Pokémon pode usar qualquer golpe que se qualifique pela regra abaixo.
+      </p>
+      <p class="regras-text">
+        Repare que a regra <strong>não</strong> é simplesmente "level atual ≥ level do golpe".
+        Se um golpe é aprendido em um level que o Pokémon só alcançaria <em>depois</em> de já
+        ter evoluído para a forma seguinte, a forma anterior nunca chega a aprendê-lo — e a
+        evolução não aprende golpes do estágio anterior que ela já "pulou". Em resumo: o
+        Pokémon sabe um golpe de level-up se, e somente se, ele alcançou aquele level
+        <strong>enquanto ainda estava naquele estágio evolutivo</strong> (ou em um estágio já
+        evoluído a partir dele).
+      </p>
+      <div class="regra-grid">
+        <div class="regra-card">
+          <div class="regra-card-title">💧 Exemplo — Squirtle</div>
+          <div class="regra-card-text">
+            Squirtle evolui para Wartortle no <strong>level 16</strong>. Protect é aprendido no
+            <strong>level 18</strong> na linha do Squirtle. Como um Squirtle de level 18 já
+            teria evoluído para Wartortle antes de alcançar esse level, <strong>nenhum Squirtle
+            sabe Protect</strong> — ele evolui antes de aprendê-lo.
+          </div>
+        </div>
+        <div class="regra-card">
+          <div class="regra-card-title">💧 Exemplo — Wartortle</div>
+          <div class="regra-card-text">
+            Wartortle evolui para Blastoise no <strong>level 36</strong>. Iron Defense é
+            aprendido no <strong>level 40</strong>. Como um Wartortle de level 40 já teria
+            evoluído para Blastoise antes desse level, <strong>nenhum Wartortle sabe Iron
+            Defense</strong>.
+          </div>
+        </div>
+        <div class="regra-card">
+          <div class="regra-card-title">💧 Exemplo — Blastoise</div>
+          <div class="regra-card-text">
+            Um Blastoise (estágio final) nunca mais evolui, então ele tem acesso a
+            <strong>toda a tabela de level-up da linha evolutiva inteira</strong> conforme vai
+            subindo de level — incluindo Protect (lvl 18) e Iron Defense (lvl 40), que as formas
+            anteriores nunca chegam a aprender.
+          </div>
+        </div>
+      </div>
+      <p class="regras-text">
+        Na prática, ao montar a lista de golpes de um Pokémon: pegue a tabela de level-up de
+        cada estágio da linha na Pokédex e, para cada estágio, considere apenas os golpes cujo
+        level de aprendizado é <strong>menor ou igual ao level em que aquele estágio termina</strong>
+        (o level da próxima evolução, ou o level atual do Pokémon, o que for menor). Some os
+        golpes válidos de todos os estágios já alcançados. Golpes ensinados por <strong>TM/TR,
+        tutor ou evento</strong> não seguem essa regra de level — eles podem ser ensinados a
+        qualquer momento em que o Pokémon já tenha evoluído para uma forma capaz de aprendê-los,
+        a critério do Narrador.
+      </p>
+
       <!-- CLASSE DE ARMADURA -->
       <h3 class="subsection-title">🛡️ Classe de Armadura (CA)</h3>
       <p class="regras-text">
@@ -527,6 +613,17 @@
         o teste de esquiva descrito mais abaixo.
       </p>
 
+      <h4 class="micro-title">💢 Erro Crítico (1 natural)</h4>
+      <p class="regras-text">
+        Quando o d20 do ataque sai <strong>1 natural</strong>, o ataque erra automaticamente,
+        não importa a CA do alvo — e o atacante se desequilibra, tropeça ou erra a mira de forma
+        tão grosseira que <strong>se machuca com o próprio golpe</strong>: o Pokémon atacante
+        sofre <strong>1 bolinha de dano</strong>. Esse dano de auto-falha não tem tipo (não
+        aciona fraqueza, resistência ou imunidade), não pode ser reduzido por estágios de Defesa
+        e não conta como "ser atacado" para efeitos de golpes ou habilidades que reagem a sofrer
+        dano de um oponente.
+      </p>
+
       <!-- ESTÁGIOS DE STATUS -->
       <h3 class="subsection-title">📊 Estágios de Status</h3>
       <p class="regras-text">
@@ -585,6 +682,31 @@
             defensor (tornando mais difícil para ele desviar).
           </div>
         </div>
+      </div>
+
+      <div class="nota-escopo">
+        <div class="nota-escopo-title">⚠️ Nota de Esclarecimento — Cada Estágio Afeta Só o Que Está Descrito</div>
+        <ul class="nota-escopo-list">
+          <li><strong>Velocidade</strong> só altera a CA (e a ordem de turno). Ela <strong>não</strong>
+          é afetada nem rebatida por Precisão — a única forma de responder a uma CA alta por
+          Velocidade é subir a própria Velocidade ou baixar a do oponente (golpes como Agility,
+          Sand Attack, String Shot), no mesmo intervalo de turnos em que o efeito foi montado.</li>
+          <li><strong>Precisão</strong> é uma mecânica exclusiva para neutralizar <strong>Evasão</strong>
+          no teste de Esquiva. Ela não interage com CA, com Ataque/Defesa, nem com mais nada do
+          sistema — Precisão alta não ajuda a "acertar mais fácil" contra um alvo com CA alta por
+          Velocidade, só contra um alvo que está testando Esquiva.</li>
+          <li><strong>Evasão</strong> só entra em jogo depois que o ataque já acertou a CA — ela
+          não reduz a chance de acerto em si, ela dá ao defensor uma chance adicional de desviar
+          (com possível contra-ataque). Um defensor com Evasão 0 não rola esse teste, mesmo que
+          tenha CA alta por outro motivo (ex: Velocidade).</li>
+          <li><strong>Ataque e Defesa</strong> só concedem o bônus/penalidade de dano a cada
+          <strong>2 estágios completos</strong> (1, 3 e 5 estágios isolados não fazem nada
+          sozinhos). Isso é intencional — veja a regra de "Golpes Conhecidos" acima: como um
+          Pokémon mais jovem normalmente só tem acesso a golpes de buff/debuff de 1 estágio
+          (golpes de 2 estágios como Swords Dance costumam vir em níveis mais altos), essa escada
+          de 2 em 2 já fica naturalmente equilibrada pela progressão de moveset, sem precisar de
+          ajuste adicional.</li>
+        </ul>
       </div>
 
       <p class="regras-text">

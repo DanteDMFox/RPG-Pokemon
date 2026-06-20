@@ -310,16 +310,44 @@
   border-radius: var(--radius-sm);
   padding: 10px 14px;
   display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.move-top-row {
+  display: flex;
   align-items: center;
   justify-content: space-between;
   flex-wrap: wrap;
   gap: 6px;
+}
+.move-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 .move-name {
   font-weight: 800;
   font-size: 0.82rem;
   text-transform: capitalize;
   flex: 1;
+}
+.move-level-badge {
+  font-size: 0.66rem;
+  font-weight: 800;
+  color: var(--pokeyellow);
+  background: rgba(248,208,48,0.12);
+  border: 1px solid rgba(248,208,48,0.3);
+  border-radius: 999px;
+  padding: 2px 9px;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+.move-description {
+  font-size: 0.76rem;
+  color: var(--text-offwhite);
+  line-height: 1.5;
+  font-style: italic;
+  margin: 0;
 }
 .move-meta {
   display: flex;

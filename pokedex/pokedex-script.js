@@ -322,6 +322,25 @@ async function loadMoves() {
           const res  = await fetch(m.move.url);
           const data = await res.json();
           const level = m.version_group_details?.[0]?.level_learned_at ?? 0;
+
+          // Descrição: prioriza flavor_text em pt-BR/pt, depois en;
+          // se não houver flavor text, cai pro effect_entries (short_effect) em en.
+          const flavorEntries = data.flavor_text_entries || [];
+          let desc = (flavorEntries.find(e => e.language.name === 'pt-BR')
+                   || flavorEntries.find(e => e.language.name === 'pt')
+                   || flavorEntries.find(e => e.language.name === 'en'));
+          let description = desc
+            ? desc.flavor_text.replace(/\f/g, ' ').replace(/\n/g, ' ').trim()
+            : '';
+          if (!description) {
+            const effEn = (data.effect_entries || []).find(e => e.language.name === 'en');
+            if (effEn) {
+              description = (effEn.short_effect || effEn.effect || '')
+                .replace(/\$effect_chance/g, data.effect_chance ?? '');
+            }
+          }
+          if (!description) description = 'Descrição não disponível.';
+
           return {
             name:     data.name,
             type:     data.type.name,
@@ -329,7 +348,8 @@ async function loadMoves() {
             power:    data.power    ?? '—',
             accuracy: data.accuracy ?? '—',
             pp:       data.pp       ?? '—',
-            level
+            level,
+            description
           };
         } catch { return null; }
       });
@@ -349,16 +369,19 @@ async function loadMoves() {
 
     const movesHTML = details.map(m => `
       <div class="move-item">
-        <div class="move-left">
-          <span class="pdx-type-badge" style="background:${TYPE_COLORS[m.type] || '#888'};font-size:0.65rem;padding:2px 8px">${m.type}</span>
-          <span class="move-name">${m.name.replace(/-/g, ' ')}</span>
+        <div class="move-top-row">
+          <div class="move-left">
+            <span class="pdx-type-badge" style="background:${TYPE_COLORS[m.type] || '#888'};font-size:0.65rem;padding:2px 8px">${m.type}</span>
+            <span class="move-name">${m.name.replace(/-/g, ' ')}</span>
+          </div>
+          <span class="move-level-badge" title="Level em que é aprendido">${m.level > 0 ? `Lv. ${m.level}` : 'TM/Tutor'}</span>
         </div>
+        <p class="move-description">${m.description}</p>
         <div class="move-meta">
           <span title="Categoria">${catIcon[m.category] || ''} ${m.category}</span>
           <span title="Poder">💥 ${m.power}</span>
           <span title="Precisão">🎯 ${m.accuracy}</span>
           <span title="PP">PP ${m.pp}</span>
-          ${m.level > 0 ? `<span title="Level">Lv.${m.level}</span>` : '<span>—</span>'}
         </div>
       </div>
     `).join('');
