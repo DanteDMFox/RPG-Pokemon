@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Itens — RPG Pokémon</title>
+  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="../pokedex/pokedex-style.css">
+  <link rel="stylesheet" href="itens-style.css">
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="navbar">
+    <div class="navbar-inner">
+      <a href="../ficha/index.html" class="navbar-brand">
+        <div class="pokeball-icon"></div>
+        <span>RPG Pokémon</span>
+      </a>
+      <ul class="navbar-nav">
+        <li><a href="../ficha/index.html">📋 Ficha</a></li>
+        <li><a href="../pokedex/index.html">📖 Pokédex</a></li>
+        <li><a href="../itens/index.html" class="active">🎒 Itens</a></li>
+        <li><a href="../regras/index.html">📜 Regras</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <div class="pokedex-container">
+
+    <div class="page-hero">
+      <h1>🎒 Itens</h1>
+      <p>Consulte poções, bolas, berries e outros itens do mundo Pokémon</p>
+    </div>
+
+    <!-- CONTROLS -->
+    <div class="pdx-controls section">
+      <div class="pdx-search-row">
+        <input type="text" id="searchInput" class="pdx-search"
+               placeholder="🔍 Buscar item por nome...">
+        <select id="categoryFilter" class="pdx-type-filter">
+          <option value="">Todas as categorias</option>
+        </select>
+      </div>
+      <div class="pdx-stats">
+        <span>Mostrando: <strong id="shownCount">0</strong></span>
+        <span>Total: <strong id="totalCount">0</strong></span>
+      </div>
+    </div>
+
+    <!-- GRID -->
+    <div class="pdx-grid itens-grid" id="itemsGrid">
+      <div class="pdx-loading">⏳ Carregando itens...</div>
+    </div>
+
+  </div><!-- /pokedex-container -->
+
+  <!-- MODAL -->
+  <div id="modalDetalhes" class="pdx-modal">
+    <div class="pdx-modal-content">
+      <button class="pdx-modal-close" id="modalClose">✕</button>
+      <div class="pdx-modal-body" id="modalBody"></div>
+    </div>
+  </div>
+
+  <script src="itens-script.js"></script>
+</body>
+</html>

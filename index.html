@@ -87,7 +87,7 @@
       margin: 0 auto;
       padding: 28px 20px 56px;
       display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
+      grid-template-columns: repeat(4, minmax(0, 1fr));
       gap: 18px;
     }
 
@@ -105,6 +105,9 @@
       .home-deck { grid-template-columns: 1fr; max-width: 320px; }
       .home-deck .tcg-card { aspect-ratio: var(--card-aspect); }
     }
+    @media (min-width: 761px) and (max-width: 980px) {
+      .home-deck { grid-template-columns: repeat(2, minmax(0, 1fr)); max-width: 640px; }
+    }
   </style>
 </head>
 <body>
@@ -119,6 +122,7 @@
       <ul class="navbar-nav">
         <li><a href="ficha/index.html">📋 Ficha</a></li>
         <li><a href="pokedex/index.html">📖 Pokédex</a></li>
+        <li><a href="itens/index.html">🎒 Itens</a></li>
         <li><a href="regras/index.html">📜 Regras</a></li>
       </ul>
     </div>
@@ -166,6 +170,25 @@
         <div class="tcg-card-body">
           <h2>Pokédex</h2>
           <p>Todos os Pokémon, filtros por tipo e registro de capturas.</p>
+        </div>
+        <div class="tcg-card-footer">
+          <span class="tcg-card-cta">Abrir <span class="arrow">→</span></span>
+        </div>
+      </div>
+    </a>
+
+    <a href="itens/index.html" class="tcg-card" style="--tcg-accent: var(--pokegray);">
+      <div class="tcg-card-inner">
+        <div class="tcg-card-top">
+          <span class="tcg-card-eyebrow">Bolsa</span>
+          <span class="tcg-card-type-pip">🎒</span>
+        </div>
+        <div class="tcg-card-art" id="artItens">
+          <span class="tcg-card-icon-fallback">🎒</span>
+        </div>
+        <div class="tcg-card-body">
+          <h2>Itens</h2>
+          <p>Poções, Poké Bolas, berries e outros itens para consulta.</p>
         </div>
         <div class="tcg-card-footer">
           <span class="tcg-card-cta">Abrir <span class="arrow">→</span></span>
@@ -222,6 +245,17 @@
         // mantém o emoji de fallback já presente no HTML
       }
     });
+
+    // Carta de Itens usa o sprite de um item (Master Ball), não um Pokémon.
+    (async () => {
+      const el = document.getElementById('artItens');
+      if (!el) return;
+      const src = 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/master-ball.png';
+      const img = new Image();
+      img.onload  = () => { el.innerHTML = `<img src="${src}" alt="master ball" style="width:60%;height:60%;image-rendering:pixelated">`; };
+      img.onerror = () => { /* mantém o emoji de fallback já presente no HTML */ };
+      img.src = src;
+    })();
   </script>
 
 </body>
