@@ -907,6 +907,48 @@ document.addEventListener('keydown', (e) => {
   }
 });
 
+// ---- POKÉ BOLAS (contador +/-) ----
+function initBallCounters() {
+  document.querySelectorAll('.ball-counter-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const input = document.getElementById(btn.dataset.target);
+      if (!input) return;
+      const delta = parseInt(btn.dataset.delta, 10) || 0;
+      const atual = parseInt(input.value, 10) || 0;
+      const min   = parseInt(input.min, 10) || 0;
+      input.value = Math.max(min, atual + delta);
+      // dispara 'change' manualmente pra disparar o auto-save (form listener)
+      input.dispatchEvent(new Event('change', { bubbles: true }));
+    });
+  });
+
+  // Corrige digitação manual (negativo ou vazio) ao sair do campo
+  document.querySelectorAll('.ball-counter-input').forEach(input => {
+    input.addEventListener('blur', () => {
+      const min = parseInt(input.min, 10) || 0;
+      const val = parseInt(input.value, 10);
+      input.value = Number.isNaN(val) ? min : Math.max(min, val);
+    });
+  });
+}
+
+// Migra fichas antigas: o campo único "pokebolas" virava só Poké Ball comum.
+// Roda uma vez por ficha, só se o novo campo ainda estiver zerado/vazio.
+function migrarPokebolasAntigas() {
+  const raw = localStorage.getItem(chaveFicha());
+  if (!raw) return;
+  try {
+    const dados = JSON.parse(raw);
+    if (dados.pokebolas && !dados.qtdPokeBall) {
+      const input = document.getElementById('qtdPokeBall');
+      if (input) {
+        input.value = dados.pokebolas;
+        salvarDados(); // persiste já no novo formato
+      }
+    }
+  } catch { /* ignora ficha corrompida */ }
+}
+
 // ---- FORM SUBMIT ----
 form.addEventListener('submit', (e) => {
   e.preventDefault();
@@ -940,6 +982,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   await buildPartySlots();
   initFotoUpload();
   carregarDados();
+  migrarPokebolasAntigas();
+  initBallCounters();
   populateCapturedDropdowns(); // garante que os selects refletem o estado final pós-carregarDados
   console.log('🔴⚪ Ficha de Pokémon carregada!');
 });

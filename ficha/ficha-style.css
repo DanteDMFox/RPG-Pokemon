@@ -578,6 +578,116 @@
   padding-top: 10px;
 }
 
+/* ---- POKÉ BOLAS (contador visual) ---- */
+.ball-counter-row {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.ball-counter-card {
+  position: relative;
+  background: var(--tcg-frame);
+  border: 2px solid var(--tcg-frame-lite);
+  border-radius: var(--radius-card);
+  padding: 4px;
+  transition: var(--transition);
+}
+.ball-counter-card:hover {
+  border-color: var(--pokeyellow);
+  box-shadow: var(--shadow-sm);
+}
+
+.ball-counter-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: var(--radius-card);
+  background: linear-gradient(120deg,
+    var(--tcg-holo-1) 0%, transparent 25%,
+    var(--tcg-holo-2) 50%, transparent 75%,
+    var(--tcg-holo-3) 100%);
+  opacity: 0.35;
+  pointer-events: none;
+  mix-blend-mode: screen;
+}
+
+.ball-counter-card > * { position: relative; z-index: 1; }
+
+.ball-counter-img {
+  display: block;
+  width: 56px;
+  height: 56px;
+  object-fit: contain;
+  image-rendering: pixelated;
+  margin: 10px auto 4px;
+  filter: drop-shadow(0 4px 8px rgba(0,0,0,0.45));
+}
+
+.ball-counter-name {
+  display: block;
+  text-align: center;
+  font-size: 0.74rem;
+  font-weight: 800;
+  color: var(--text-offwhite);
+  margin-bottom: 10px;
+}
+
+.ball-counter-controls {
+  display: flex;
+  align-items: stretch;
+  gap: 6px;
+  background: linear-gradient(165deg, var(--bg-card) 0%, #161c2e 100%);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: var(--radius-md);
+  padding: 6px;
+  margin: 0 4px 6px;
+}
+
+.ball-counter-btn {
+  flex: 0 0 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.18);
+  border-radius: var(--radius-sm);
+  color: var(--text-white);
+  font-size: 1.05rem;
+  font-weight: 800;
+  line-height: 1;
+  cursor: pointer;
+  transition: var(--transition);
+  user-select: none;
+}
+.ball-counter-btn:hover {
+  background: var(--pokered);
+  border-color: var(--pokered-dark);
+}
+.ball-counter-btn:active { transform: scale(0.92); }
+.ball-counter-btn:first-child:hover { background: var(--pokered); }
+
+.ball-counter-input {
+  flex: 1;
+  min-width: 0;
+  text-align: center;
+  font-size: 1rem;
+  font-weight: 800;
+  padding: 6px 4px;
+  /* esconde as setinhas nativas do input number */
+  -moz-appearance: textfield;
+}
+.ball-counter-input::-webkit-outer-spin-button,
+.ball-counter-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+@media (max-width: 560px) {
+  .ball-counter-row { grid-template-columns: 1fr; }
+}
+
 /* ---- PRINT ---- */
 @media print {
   .navbar, .form-actions { display: none; }
