@@ -56,6 +56,29 @@
   color: var(--pokeyellow);
 }
 
+/* ---- DRAG & DROP das abas ---- */
+.sheet-tab {
+  cursor: grab;
+  position: relative;
+}
+.sheet-tab.dragging {
+  opacity: 0.4;
+  cursor: grabbing;
+}
+.sheet-tab.drag-over-before::before,
+.sheet-tab.drag-over-after::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  bottom: 2px;
+  width: 3px;
+  border-radius: 2px;
+  background: var(--pokeyellow);
+  box-shadow: 0 0 6px rgba(248,208,48,0.6);
+}
+.sheet-tab.drag-over-before::before { left: -4px; }
+.sheet-tab.drag-over-after::after   { right: -4px; }
+
 .sheet-tab-name {
   overflow: hidden;
   text-overflow: ellipsis;

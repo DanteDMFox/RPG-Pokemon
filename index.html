@@ -5,6 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>RPG Pokémon</title>
   <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="themes/tcg.css">
+  <link rel="stylesheet" href="themes/theme-picker.css">
+  <script src="theme-engine.js"></script>
   <style>
     /* ============================================
        HOME — ESTILOS ESPECÍFICOS
@@ -236,8 +239,7 @@
       try {
         const res  = await fetch(`https://pokeapi.co/api/v2/pokemon/${pokemonId}`);
         const data = await res.json();
-        const src  = data.sprites?.other?.['official-artwork']?.front_default
-                  || data.sprites?.front_default;
+        const src  = getThemeSpriteUrl(pokemonId, data.sprites);
         if (src) {
           el.innerHTML = `<img src="${src}" alt="${data.name}">`;
         }

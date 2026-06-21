@@ -30,22 +30,19 @@ function criarSheetId() {
   return 'sheet_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
 }
 
-// Acha o menor número N >= 1 tal que nenhuma ficha "não editada" (ainda no
-// nome padrão "Ficha N") esteja usando esse número. Fichas renomeadas
-// (editado === true) liberam seu número de volta pro próximo "Nova ficha".
-function proximoNumeroLivre() {
-  const usados = new Set(
-    sheetsIndex
-      .filter(s => !s.editado)
-      .map(s => {
-        const m = /^Ficha (\d+)$/.exec(s.nome);
-        return m ? parseInt(m[1], 10) : null;
-      })
-      .filter(n => n !== null)
-  );
+// Renumera, em sequência (1, 2, 3...), todas as fichas que ainda estão no
+// nome padrão "Ficha N" — respeitando a ORDEM ATUAL do array sheetsIndex
+// (que também é a ordem visual das abas). Fichas renomeadas (editado: true)
+// são puladas e mantêm o nome escolhido pelo jogador.
+// Chamada sempre que algo muda a ordem ou os nomes: renomear, criar, apagar
+// ou arrastar uma aba — assim o "Ficha N" sempre reflete a posição real.
+function renumerarFichasNaoEditadas() {
   let n = 1;
-  while (usados.has(n)) n++;
-  return n;
+  sheetsIndex.forEach(s => {
+    if (s.editado) return;
+    s.nome = `Ficha ${n}`;
+    n++;
+  });
 }
 
 let sheetsIndex = loadSheetsIndex();
@@ -69,6 +66,8 @@ function renderSheetTabs() {
     const tab = document.createElement('div');
     tab.className = 'sheet-tab' + (sheet.id === activeSheetId ? ' active' : '');
     tab.dataset.id = sheet.id;
+    tab.draggable = true;
+    tab.title = 'Arraste para reordenar · Duplo clique no nome para renomear';
 
     const nameSpan = document.createElement('span');
     nameSpan.className = 'sheet-tab-name';
@@ -77,19 +76,23 @@ function renderSheetTabs() {
 
     nameSpan.addEventListener('dblclick', (e) => {
       e.stopPropagation();
+      tab.draggable = false; // evita conflito entre arrastar a aba e selecionar/editar o texto
       nameSpan.contentEditable = 'true';
       nameSpan.focus();
       document.execCommand('selectAll', false, null);
     });
     nameSpan.addEventListener('blur', () => {
       nameSpan.contentEditable = 'false';
+      tab.draggable = true;
       const novoNome = nameSpan.textContent.trim() || 'Sem nome';
-      nameSpan.textContent = novoNome;
       sheet.nome = novoNome;
       // Considera "editada" qualquer ficha cujo nome não seja exatamente o
-      // padrão "Ficha N" — isso libera (ou ocupa) o número pra próxima criação.
+      // padrão "Ficha N" — isso faz as fichas seguintes (não editadas)
+      // deslizarem pra preencher o número que ficou vago.
       sheet.editado = !/^Ficha \d+$/.test(novoNome);
+      renumerarFichasNaoEditadas();
       salvarSheetsIndex(sheetsIndex);
+      renderSheetTabs(); // re-renderiza pra refletir os nomes renumerados
     });
     nameSpan.addEventListener('keydown', (e) => {
       if (e.key === 'Enter') { e.preventDefault(); nameSpan.blur(); }
@@ -115,13 +118,84 @@ function renderSheetTabs() {
       tab.appendChild(closeBtn);
     }
 
+    attachTabDragHandlers(tab, sheet, nameSpan);
+
     wrap.appendChild(tab);
   });
 }
 
+// ---- DRAG & DROP das abas (reordenar fichas) ----
+// Usa a HTML5 Drag and Drop API nativa, sem dependências externas.
+// Ao soltar, reordena sheetsIndex (que também define a ordem visual) e
+// renumera as fichas não editadas pra bater com a nova posição.
+let dragSheetId = null;
+
+function attachTabDragHandlers(tab, sheet, nameSpan) {
+  tab.addEventListener('dragstart', (e) => {
+    // Não inicia o arraste se o nome estiver em edição (senão atrapalha a digitação)
+    if (nameSpan.contentEditable === 'true') { e.preventDefault(); return; }
+    dragSheetId = sheet.id;
+    tab.classList.add('dragging');
+    e.dataTransfer.effectAllowed = 'move';
+    // Necessário em alguns navegadores (Firefox) pra ativar o drag
+    try { e.dataTransfer.setData('text/plain', sheet.id); } catch { /* ignore */ }
+  });
+
+  tab.addEventListener('dragend', () => {
+    tab.classList.remove('dragging');
+    document.querySelectorAll('.sheet-tab.drag-over-before, .sheet-tab.drag-over-after')
+      .forEach(el => el.classList.remove('drag-over-before', 'drag-over-after'));
+    dragSheetId = null;
+  });
+
+  tab.addEventListener('dragover', (e) => {
+    if (!dragSheetId || dragSheetId === sheet.id) return;
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+
+    // Decide se o indicador fica antes ou depois desta aba, conforme a
+    // posição do cursor em relação ao centro da aba sobrevoada.
+    const rect   = tab.getBoundingClientRect();
+    const before = (e.clientX - rect.left) < rect.width / 2;
+    tab.classList.toggle('drag-over-before', before);
+    tab.classList.toggle('drag-over-after', !before);
+  });
+
+  tab.addEventListener('dragleave', () => {
+    tab.classList.remove('drag-over-before', 'drag-over-after');
+  });
+
+  tab.addEventListener('drop', (e) => {
+    e.preventDefault();
+    const before = tab.classList.contains('drag-over-before');
+    tab.classList.remove('drag-over-before', 'drag-over-after');
+    if (!dragSheetId || dragSheetId === sheet.id) return;
+    moverFicha(dragSheetId, sheet.id, before);
+  });
+}
+
+// Move a ficha "origemId" pra posição imediatamente antes/depois de "destinoId"
+// dentro de sheetsIndex, e renumera as fichas não editadas em sequência.
+function moverFicha(origemId, destinoId, before) {
+  const origemIdx = sheetsIndex.findIndex(s => s.id === origemId);
+  if (origemIdx === -1) return;
+  const [movida] = sheetsIndex.splice(origemIdx, 1);
+
+  let destinoIdx = sheetsIndex.findIndex(s => s.id === destinoId);
+  if (destinoIdx === -1) { sheetsIndex.push(movida); }
+  else {
+    sheetsIndex.splice(before ? destinoIdx : destinoIdx + 1, 0, movida);
+  }
+
+  renumerarFichasNaoEditadas();
+  salvarSheetsIndex(sheetsIndex);
+  renderSheetTabs();
+}
+
 // Sincroniza o nome da aba com o campo "Nome" (do treinador) do formulário.
 // Editar esse campo conta como "editar o nome do personagem" — a aba passa
-// a mostrar o nome digitado e libera o número "Ficha N" pra próxima criação.
+// a mostrar o nome digitado e as fichas seguintes (não editadas) deslizam
+// pra preencher o número que ficou vago.
 function sincronizarNomeAba() {
   const nomeInput = document.getElementById('nome');
   const sheet = sheetsIndex.find(s => s.id === activeSheetId);
@@ -132,12 +206,12 @@ function sincronizarNomeAba() {
     sheet.nome = novoNome;
     sheet.editado = !/^Ficha \d+$/.test(novoNome);
   } else {
-    // Campo de nome vazio: volta a aba pro padrão "Ficha N" (próximo livre)
-    // só se ela ainda não tiver um nome manual diferente preservado.
+    // Campo de nome vazio: volta a aba a fazer parte da sequência "Ficha N"
+    // automática, só se ela já não fosse parte dela.
     if (!sheet.editado) return;
-    sheet.nome = `Ficha ${proximoNumeroLivre()}`;
     sheet.editado = false;
   }
+  renumerarFichasNaoEditadas();
   salvarSheetsIndex(sheetsIndex);
   renderSheetTabs();
 }
@@ -151,9 +225,9 @@ function trocarFicha(sheetId) {
 
 async function novaFicha() {
   salvarDados();
-  const numero = proximoNumeroLivre();
-  const novo = { id: criarSheetId(), nome: `Ficha ${numero}`, editado: false };
+  const novo = { id: criarSheetId(), nome: 'Ficha', editado: false };
   sheetsIndex.push(novo);
+  renumerarFichasNaoEditadas(); // calcula o número certo pra essa e ajusta as demais
   salvarSheetsIndex(sheetsIndex);
   activeSheetId = novo.id;
   localStorage.setItem(ACTIVE_SHEET_KEY, activeSheetId);
@@ -173,6 +247,7 @@ function apagarFicha(sheetId) {
   localStorage.removeItem(`fichaPartyAssignments_${sheetId}`);
 
   sheetsIndex = sheetsIndex.filter(s => s.id !== sheetId);
+  renumerarFichasNaoEditadas();
   salvarSheetsIndex(sheetsIndex);
 
   if (activeSheetId === sheetId) {

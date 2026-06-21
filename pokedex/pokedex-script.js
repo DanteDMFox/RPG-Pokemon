@@ -145,9 +145,7 @@ function makeCard(p) {
   const accentColor = TYPE_COLORS[primaryType] || '#888';
   card.style.setProperty('--card-type-color', accentColor);
 
-  const imgSrc = p.sprites?.other?.['official-artwork']?.front_default
-              || p.sprites?.front_default
-              || `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${p.id}.png`;
+  const imgSrc = getThemeSpriteUrl(p.id, p.sprites);
 
   const types = p.types.map(t =>
     `<span class="pdx-type-badge" style="background:${TYPE_COLORS[t.type.name] || '#888'}">${t.type.name}</span>`
@@ -174,6 +172,7 @@ async function openModal(p) {
 
   modalBody.innerHTML = '<div class="pdx-loading" style="padding:40px">⏳ Carregando...</div>';
   modal.classList.add('show');
+  modal.dataset.openId = p.id;
 
   try {
     // 1. Species → description
@@ -221,7 +220,7 @@ async function openModal(p) {
     // 4. Render modal
     modalBody.innerHTML = `
       <div class="modal-pokemon-image">
-        <img src="${p.sprites?.other?.['official-artwork']?.front_default || p.sprites?.front_default}"
+        <img src="${getThemeSpriteUrl(p.id, p.sprites)}"
              alt="${p.name}"
              onerror="this.src='https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${p.id}.png'">
       </div>
@@ -509,5 +508,18 @@ function confirmReset() {
     filterPokemon();
   }
 }
+
+// ---- Tema mudou: re-renderiza com os sprites já carregados, sem refetch ----
+document.addEventListener('rpgpokemon:themechange', () => {
+  if (allPokemon.length) filterPokemon();
+  // Se o modal de detalhes estiver aberto, só troca o src da imagem
+  // (evita refazer os fetches de species/types/moves por causa do sprite)
+  if (modal.classList.contains('show')) {
+    const openId = parseInt(modal.dataset.openId, 10);
+    const p = allPokemon.find(x => x.id === openId);
+    const img = modalBody.querySelector('.modal-pokemon-image img');
+    if (p && img) img.src = getThemeSpriteUrl(p.id, p.sprites);
+  }
+});
 
 console.log('🔴 Pokédex carregada!');

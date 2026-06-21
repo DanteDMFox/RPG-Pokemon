@@ -1,0 +1,22 @@
+/* ============================================
+   TEMA: TCG CLÁSSICO (padrão)
+   Este é o visual original do site — cartas holográficas, artwork
+   oficial moderno. Como style.css já define essas variáveis no :root,
+   este arquivo não precisa sobrescrever nada: ele existe só pra
+   formalizar a convenção que os próximos temas (GBC, GBA, DS, 3D
+   Moderno) vão seguir.
+
+   Convenção pra novos temas:
+   - Tudo dentro de [data-theme="<id>"] { ... }
+   - Sobrescrever só as variáveis de style.css (--bg-page, --pokered,
+     --tcg-frame, fontes etc.) — nunca redeclarar seletores inteiros,
+     pra herdar layout/espaçamento automaticamente.
+   - Se o tema tiver moldura de hardware (frame), os estilos do frame
+     ficam num bloco [data-frame="<id>"] separado, porque tema (cores)
+     e frame (moldura) são independentes — alguém pode querer cores
+     GBC sem moldura, por exemplo.
+   ============================================ */
+
+[data-theme="tcg"] {
+  /* Intencionalmente vazio — usa as variáveis padrão do :root em style.css */
+}

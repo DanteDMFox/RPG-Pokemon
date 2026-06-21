@@ -1,0 +1,194 @@
+/* ============================================
+   THEME PICKER — botão + modal
+   Estilos do seletor de temas em si. Usa as variáveis globais (--bg-card,
+   --pokeyellow etc.) então herda automaticamente a paleta do tema ativo,
+   sem precisar de overrides próprios por tema.
+   ============================================ */
+
+.theme-pick-holder {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  list-style: none;
+  margin-left: 4px;
+  padding-left: 8px;
+  border-left: 1px solid rgba(255,255,255,0.15);
+}
+
+.theme-pick-trigger {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 12px;
+  border-radius: var(--radius-md);
+  background: rgba(255,255,255,0.1);
+  border: 2px solid rgba(255,255,255,0.22);
+  color: var(--text-white);
+  font-family: 'Nunito', sans-serif;
+  font-weight: 700;
+  font-size: 0.78rem;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: var(--transition);
+}
+.theme-pick-trigger:hover {
+  background: rgba(255,255,255,0.18);
+  border-color: var(--pokeyellow);
+}
+
+@media (max-width: 700px) {
+  .theme-pick-trigger span { display: none; }
+  .theme-pick-trigger::before {
+    content: '🎨';
+    font-size: 1rem;
+  }
+}
+
+/* ---- MODAL ---- */
+.theme-modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.75);
+  z-index: 3000;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  backdrop-filter: blur(4px);
+}
+.theme-modal.show {
+  display: flex;
+  animation: fadeIn 0.2s ease-out;
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.theme-modal-content {
+  background: linear-gradient(135deg, var(--bg-card), #1a2744);
+  border: 2px solid rgba(255,255,255,0.12);
+  border-radius: var(--radius-xl);
+  max-width: 560px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  padding: 30px 28px;
+  position: relative;
+  box-shadow: var(--shadow-lg);
+}
+
+.theme-modal-close {
+  position: absolute;
+  top: 14px;
+  right: 16px;
+  background: rgba(255,255,255,0.1);
+  border: none;
+  color: var(--text-white);
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition);
+}
+.theme-modal-close:hover { background: var(--pokered); }
+
+.theme-modal-title {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.95rem;
+  color: var(--pokeyellow);
+  margin-bottom: 8px;
+  text-shadow: 0 0 20px rgba(248,208,48,0.3);
+}
+
+.theme-modal-subtitle {
+  color: var(--text-gray);
+  font-size: 0.84rem;
+  margin-bottom: 22px;
+  line-height: 1.5;
+}
+
+.theme-modal-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+@media (max-width: 480px) {
+  .theme-modal-grid { grid-template-columns: 1fr; }
+}
+
+.theme-pick-btn {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  text-align: left;
+  background: rgba(255,255,255,0.04);
+  border: 2px solid rgba(255,255,255,0.1);
+  border-radius: var(--radius-lg);
+  padding: 14px 16px;
+  cursor: pointer;
+  transition: var(--transition);
+  font-family: 'Nunito', sans-serif;
+  color: var(--text-offwhite);
+}
+.theme-pick-btn:hover:not(:disabled) {
+  background: rgba(255,255,255,0.09);
+  border-color: var(--pokeyellow);
+  transform: translateY(-2px);
+}
+.theme-pick-btn.active {
+  border-color: var(--pokeyellow);
+  background: rgba(248,208,48,0.1);
+  box-shadow: 0 0 0 1px var(--pokeyellow);
+}
+.theme-pick-btn.active::after {
+  content: '✓';
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  color: var(--pokeyellow);
+  font-weight: 900;
+}
+.theme-pick-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.theme-pick-icon {
+  font-size: 1.6rem;
+  line-height: 1;
+  margin-bottom: 2px;
+}
+.theme-pick-name {
+  font-weight: 800;
+  font-size: 0.86rem;
+  color: var(--text-white);
+}
+.theme-pick-desc {
+  font-size: 0.72rem;
+  color: var(--text-gray);
+  line-height: 1.4;
+}
+.theme-pick-soon-badge {
+  margin-top: 4px;
+  font-size: 0.6rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--pokeyellow);
+  background: rgba(248,208,48,0.12);
+  border: 1px solid rgba(248,208,48,0.3);
+  border-radius: 999px;
+  padding: 2px 9px;
+  align-self: flex-start;
+}
+
+@media (max-width: 600px) {
+  .theme-modal-content { padding: 22px 18px; }
+}
