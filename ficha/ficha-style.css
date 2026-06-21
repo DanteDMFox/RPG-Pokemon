@@ -8,6 +8,107 @@
   padding: 20px 20px 60px;
 }
 
+/* ---- ABAS DE FICHAS (múltiplos personagens / NPCs) ---- */
+.sheet-tabs-wrapper {
+  display: flex;
+  align-items: flex-end;
+  gap: 6px;
+  margin-bottom: 24px;
+  border-bottom: 2px solid var(--bg-surface);
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+
+.sheet-tabs {
+  display: flex;
+  gap: 4px;
+  flex: 1;
+  min-width: 0;
+}
+
+.sheet-tab {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  background: var(--bg-card);
+  border: 2px solid var(--bg-surface);
+  border-bottom: none;
+  border-radius: 10px 10px 0 0;
+  color: var(--text-gray);
+  cursor: pointer;
+  white-space: nowrap;
+  font-weight: 600;
+  font-size: 0.92rem;
+  transition: background 0.15s, color 0.15s;
+  flex-shrink: 0;
+  max-width: 200px;
+}
+
+.sheet-tab:hover {
+  color: var(--text-offwhite);
+  background: var(--bg-surface);
+}
+
+.sheet-tab.active {
+  background: var(--bg-surface);
+  border-color: var(--border-gold);
+  color: var(--pokeyellow);
+}
+
+.sheet-tab-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 130px;
+}
+
+.sheet-tab-name[contenteditable="true"] {
+  outline: none;
+  border-bottom: 1px dashed var(--pokeyellow);
+  cursor: text;
+}
+
+.sheet-tab-close {
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  color: var(--text-gray);
+  font-size: 0.8rem;
+  line-height: 1;
+}
+
+.sheet-tab-close:hover {
+  background: var(--pokered);
+  color: var(--text-white);
+}
+
+.sheet-tab-add {
+  flex-shrink: 0;
+  width: 38px;
+  height: 38px;
+  margin-bottom: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-card);
+  border: 2px solid var(--bg-surface);
+  border-radius: 10px;
+  color: var(--pokeyellow);
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.15s;
+}
+
+.sheet-tab-add:hover {
+  background: var(--bg-surface);
+  transform: scale(1.06);
+}
+
 /* ---- FOTO DO PERSONAGEM ---- */
 .foto-wrapper {
   display: flex;

@@ -12,7 +12,7 @@
   <!-- NAVBAR -->
   <nav class="navbar">
     <div class="navbar-inner">
-      <a href="#" class="navbar-brand">
+      <a href="index.html" class="navbar-brand">
         <div class="pokeball-icon"></div>
         <span>RPG Pokémon</span>
       </a>
@@ -29,6 +29,14 @@
     <div class="page-hero">
       <h1>📋 Ficha do Treinador</h1>
       <p>Preencha os dados do seu personagem</p>
+    </div>
+
+    <!-- ===== ABAS DE FICHAS (múltiplos personagens / NPCs) ===== -->
+    <div class="sheet-tabs-wrapper">
+      <div class="sheet-tabs" id="sheetTabs">
+        <!-- Abas geradas dinamicamente pelo JS -->
+      </div>
+      <button type="button" class="sheet-tab-add" id="sheetTabAdd" title="Nova ficha">➕</button>
     </div>
 
     <form id="fichaPokemon" class="ficha-form">

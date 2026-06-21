@@ -112,7 +112,7 @@ body {
 .navbar-brand .pokeball-icon {
   width: 32px;
   height: 32px;
-  background: linear-gradient(180deg, white 50%, black 50%);
+  background: linear-gradient(180deg, red 50%, white 50%);
   border-radius: 50%;
   border: 2px solid black;
   position: relative;

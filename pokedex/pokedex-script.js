@@ -2,6 +2,32 @@
 //  POKÉDEX — RPG POKÉMON
 // ============================================
 
+// ---- FICHA ATIVA ----
+// A Pokédex mostra os capturados da ficha (personagem/NPC) que estava ativa
+// por último na página Ficha, pra cada personagem ter sua própria coleção.
+const ACTIVE_SHEET_KEY  = 'fichaPokemon_activeSheet';
+const SHEETS_INDEX_KEY  = 'fichaPokemon_sheets';
+
+function getActiveSheetId() {
+  const id = localStorage.getItem(ACTIVE_SHEET_KEY);
+  return id || 'sheet_default'; // fallback se a Ficha nunca foi aberta ainda
+}
+
+function getActiveSheetName() {
+  try {
+    const list = JSON.parse(localStorage.getItem(SHEETS_INDEX_KEY)) || [];
+    const id = getActiveSheetId();
+    const found = list.find(s => s.id === id);
+    return found ? found.nome : null;
+  } catch { return null; }
+}
+
+const CAPTURED_KEY_BASE    = 'pokemonCapturados';
+const NAME_CACHE_KEY_BASE  = 'pokemonNameCache';
+
+function chaveCaptured()  { return `${CAPTURED_KEY_BASE}_${getActiveSheetId()}`; }
+function chaveNameCache() { return `${NAME_CACHE_KEY_BASE}_${getActiveSheetId()}`; }
+
 const TYPE_COLORS = {
   normal:'#A8A878', fire:'#F08030', water:'#6890F0', electric:'#F8D030',
   grass:'#78C850', ice:'#98D8D8', fighting:'#C03028', poison:'#A040A0',
@@ -45,9 +71,19 @@ const modalClose      = document.getElementById('modalClose');
 
 // ---- Init ----
 document.addEventListener('DOMContentLoaded', () => {
+  renderActiveSheetBadge();
   loadCaptured();
   loadAllPokemon();
 });
+
+function renderActiveSheetBadge() {
+  const el = document.getElementById('activeSheetBadge');
+  if (!el) return;
+  const nome = getActiveSheetName();
+  el.textContent = nome
+    ? `📋 Mostrando capturados de: ${nome}`
+    : '📋 Nenhuma ficha criada ainda — abra a aba Ficha primeiro';
+}
 
 searchInput.addEventListener('input', filterPokemon);
 typeFilter.addEventListener('change', () => { filterType = typeFilter.value; filterPokemon(); });
@@ -450,11 +486,11 @@ function updateProgress() {
 
 // ---- Persist ----
 function loadCaptured() {
-  const raw = localStorage.getItem('pokemonCapturados');
-  if (raw) captured = new Set(JSON.parse(raw));
+  const raw = localStorage.getItem(chaveCaptured());
+  captured = raw ? new Set(JSON.parse(raw)) : new Set();
 }
 function saveCaptured() {
-  localStorage.setItem('pokemonCapturados', JSON.stringify([...captured]));
+  localStorage.setItem(chaveCaptured(), JSON.stringify([...captured]));
 }
 
 // ---- Reset ----

@@ -3,6 +3,156 @@
 //  Script principal com todas as features
 // ============================================
 
+// ---- MÚLTIPLAS FICHAS (abas) ----
+// Cada ficha tem um id único. Os dados de cada ficha ficam em chaves
+// próprias no localStorage (namespaced por sheetId), então criar fichas
+// novas (ex: NPCs do mestre) nunca sobrescreve as outras.
+const SHEETS_INDEX_KEY = 'fichaPokemon_sheets'; // [{id, nome}]
+const ACTIVE_SHEET_KEY = 'fichaPokemon_activeSheet';
+
+function loadSheetsIndex() {
+  try {
+    const raw = localStorage.getItem(SHEETS_INDEX_KEY);
+    const list = raw ? JSON.parse(raw) : [];
+    if (Array.isArray(list) && list.length) return list;
+  } catch { /* ignore */ }
+  // Nenhuma ficha ainda: cria a primeira automaticamente
+  const first = { id: criarSheetId(), nome: 'Ficha 1' };
+  salvarSheetsIndex([first]);
+  return [first];
+}
+
+function salvarSheetsIndex(list) {
+  localStorage.setItem(SHEETS_INDEX_KEY, JSON.stringify(list));
+}
+
+function criarSheetId() {
+  return 'sheet_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+}
+
+let sheetsIndex = loadSheetsIndex();
+let activeSheetId = localStorage.getItem(ACTIVE_SHEET_KEY);
+if (!activeSheetId || !sheetsIndex.some(s => s.id === activeSheetId)) {
+  activeSheetId = sheetsIndex[0].id;
+  localStorage.setItem(ACTIVE_SHEET_KEY, activeSheetId);
+}
+
+// Chaves de dados que são namespaced por ficha (cada ficha tem a sua cópia)
+function chaveFicha()  { return `fichaPokemon_${activeSheetId}`; }
+function chaveFoto()   { return `fichaPokemon_foto_${activeSheetId}`; }
+function chaveParty()  { return `fichaPartyAssignments_${activeSheetId}`; }
+
+function renderSheetTabs() {
+  const wrap = document.getElementById('sheetTabs');
+  if (!wrap) return;
+  wrap.innerHTML = '';
+
+  sheetsIndex.forEach(sheet => {
+    const tab = document.createElement('div');
+    tab.className = 'sheet-tab' + (sheet.id === activeSheetId ? ' active' : '');
+    tab.dataset.id = sheet.id;
+
+    const nameSpan = document.createElement('span');
+    nameSpan.className = 'sheet-tab-name';
+    nameSpan.textContent = sheet.nome;
+    nameSpan.title = 'Duplo clique para renomear';
+
+    nameSpan.addEventListener('dblclick', (e) => {
+      e.stopPropagation();
+      nameSpan.contentEditable = 'true';
+      nameSpan.focus();
+      document.execCommand('selectAll', false, null);
+    });
+    nameSpan.addEventListener('blur', () => {
+      nameSpan.contentEditable = 'false';
+      const novoNome = nameSpan.textContent.trim() || 'Sem nome';
+      nameSpan.textContent = novoNome;
+      sheet.nome = novoNome;
+      salvarSheetsIndex(sheetsIndex);
+    });
+    nameSpan.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') { e.preventDefault(); nameSpan.blur(); }
+      if (e.key === 'Escape') { e.preventDefault(); nameSpan.textContent = sheet.nome; nameSpan.blur(); }
+    });
+
+    tab.addEventListener('click', (e) => {
+      if (nameSpan.contentEditable === 'true') return;
+      if (sheet.id !== activeSheetId) trocarFicha(sheet.id);
+    });
+
+    tab.appendChild(nameSpan);
+
+    if (sheetsIndex.length > 1) {
+      const closeBtn = document.createElement('span');
+      closeBtn.className = 'sheet-tab-close';
+      closeBtn.textContent = '✕';
+      closeBtn.title = 'Apagar esta ficha';
+      closeBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        apagarFicha(sheet.id);
+      });
+      tab.appendChild(closeBtn);
+    }
+
+    wrap.appendChild(tab);
+  });
+}
+
+function trocarFicha(sheetId) {
+  salvarDados(); // garante que a ficha atual não perde edições pendentes
+  activeSheetId = sheetId;
+  localStorage.setItem(ACTIVE_SHEET_KEY, activeSheetId);
+  recarregarFichaAtual();
+}
+
+async function novaFicha() {
+  salvarDados();
+  const novo = { id: criarSheetId(), nome: `Ficha ${sheetsIndex.length + 1}` };
+  sheetsIndex.push(novo);
+  salvarSheetsIndex(sheetsIndex);
+  activeSheetId = novo.id;
+  localStorage.setItem(ACTIVE_SHEET_KEY, activeSheetId);
+  await recarregarFichaAtual();
+  mostrarNotificacao('✨ Nova ficha criada!');
+}
+
+function apagarFicha(sheetId) {
+  if (sheetsIndex.length <= 1) return; // sempre mantém pelo menos 1 ficha
+  const sheet = sheetsIndex.find(s => s.id === sheetId);
+  const ok = confirm(`Apagar a ficha "${sheet ? sheet.nome : ''}"? Essa ação não pode ser desfeita.`);
+  if (!ok) return;
+
+  // Remove os dados namespaced dessa ficha
+  localStorage.removeItem(`fichaPokemon_${sheetId}`);
+  localStorage.removeItem(`fichaPokemon_foto_${sheetId}`);
+  localStorage.removeItem(`fichaPartyAssignments_${sheetId}`);
+
+  sheetsIndex = sheetsIndex.filter(s => s.id !== sheetId);
+  salvarSheetsIndex(sheetsIndex);
+
+  if (activeSheetId === sheetId) {
+    activeSheetId = sheetsIndex[0].id;
+    localStorage.setItem(ACTIVE_SHEET_KEY, activeSheetId);
+    recarregarFichaAtual();
+  } else {
+    renderSheetTabs();
+  }
+  mostrarNotificacao('🗑️ Ficha apagada', 'aviso');
+}
+
+// Recarrega todo o conteúdo visual da ficha atual (usado ao trocar de aba)
+async function recarregarFichaAtual() {
+  renderSheetTabs();
+  form.reset();
+  // limpa a party visualmente antes de reconstruir, pra não vazar estado entre fichas
+  partyAssignments = { 1: null, 2: null, 3: null, 4: null, 5: null, 6: null };
+  document.getElementById('partySlots').innerHTML = '';
+  await buildPartySlots();
+  carregarFoto();
+  carregarDados();
+  populateCapturedDropdowns();
+}
+
 const POKEMON_TYPES_EN = [
   'Normal','Fire','Water','Electric','Grass','Ice',
   'Fighting','Poison','Ground','Flying','Psychic','Bug',
@@ -44,8 +194,11 @@ let capturedList = []; // [{id, name}]
 // { 1: "25", 2: null, 3: "1", ... }
 let partyAssignments = { 1: null, 2: null, 3: null, 4: null, 5: null, 6: null };
 
+function chaveCaptured()  { return `pokemonCapturados_${activeSheetId}`; }
+function chaveNameCache() { return `pokemonNameCache_${activeSheetId}`; }
+
 function loadCapturedList() {
-  const raw = localStorage.getItem('pokemonCapturados');
+  const raw = localStorage.getItem(chaveCaptured());
   if (!raw) { capturedList = []; return; }
   try {
     const ids = JSON.parse(raw);
@@ -56,13 +209,12 @@ function loadCapturedList() {
 }
 
 // Cache de nomes (id -> nome) para não martelar a PokeAPI toda hora
-const POKEMON_NAME_CACHE_KEY = 'pokemonNameCache';
 function loadNameCache() {
-  try { return JSON.parse(localStorage.getItem(POKEMON_NAME_CACHE_KEY)) || {}; }
+  try { return JSON.parse(localStorage.getItem(chaveNameCache())) || {}; }
   catch { return {}; }
 }
 function saveNameCache(cache) {
-  localStorage.setItem(POKEMON_NAME_CACHE_KEY, JSON.stringify(cache));
+  localStorage.setItem(chaveNameCache(), JSON.stringify(cache));
 }
 
 async function ensureCapturedNames() {
@@ -386,10 +538,10 @@ async function fillFromPokedex(i) {
 // ---- Persistência das alocações da party (separado do localStorage da ficha em si,
 //      pra não depender da serialização do FormData) ----
 function salvarPartyAssignments() {
-  localStorage.setItem('fichaPartyAssignments', JSON.stringify(partyAssignments));
+  localStorage.setItem(chaveParty(), JSON.stringify(partyAssignments));
 }
 function carregarPartyAssignments() {
-  const raw = localStorage.getItem('fichaPartyAssignments');
+  const raw = localStorage.getItem(chaveParty());
   if (!raw) return;
   try {
     const saved = JSON.parse(raw);
@@ -627,8 +779,6 @@ function updateSlotColor(i) {
 function initFotoUpload() {
   const area    = document.getElementById('fotoArea');
   const input   = document.getElementById('fotoInput');
-  const preview = document.getElementById('fotoPreview');
-  const ph      = document.getElementById('fotoPlaceholder');
   const remove  = document.getElementById('fotoRemove');
 
   area.addEventListener('click', (e) => {
@@ -659,13 +809,27 @@ function initFotoUpload() {
     clearFoto();
   });
 
-  // Load saved photo from localStorage
-  const savedFoto = localStorage.getItem('fichaPokemon_foto');
+  carregarFoto();
+}
+
+// Carrega (ou limpa) a foto salva da ficha ativa. Chamada na inicialização
+// e sempre que o usuário troca de aba/ficha.
+function carregarFoto() {
+  const preview = document.getElementById('fotoPreview');
+  const ph      = document.getElementById('fotoPlaceholder');
+  const remove  = document.getElementById('fotoRemove');
+
+  const savedFoto = localStorage.getItem(chaveFoto());
   if (savedFoto) {
     preview.src = savedFoto;
     preview.style.display = 'block';
     ph.style.display = 'none';
     remove.style.display = 'flex';
+  } else {
+    preview.src = '';
+    preview.style.display = 'none';
+    ph.style.display = 'flex';
+    remove.style.display = 'none';
   }
 }
 
@@ -677,7 +841,7 @@ function setFoto(file) {
     document.getElementById('fotoPreview').style.display = 'block';
     document.getElementById('fotoPlaceholder').style.display = 'none';
     document.getElementById('fotoRemove').style.display = 'flex';
-    localStorage.setItem('fichaPokemon_foto', data);
+    localStorage.setItem(chaveFoto(), data);
     mostrarNotificacao('🎴 Foto salva!');
   };
   reader.readAsDataURL(file);
@@ -688,7 +852,7 @@ function clearFoto() {
   document.getElementById('fotoPreview').style.display = 'none';
   document.getElementById('fotoPlaceholder').style.display = 'flex';
   document.getElementById('fotoRemove').style.display = 'none';
-  localStorage.removeItem('fichaPokemon_foto');
+  localStorage.removeItem(chaveFoto());
 }
 
 // ---- SAVE / LOAD ----
@@ -698,16 +862,17 @@ function salvarDados() {
   const formData = new FormData(form);
   const dados = {};
   formData.forEach((v, k) => { dados[k] = v; });
-  localStorage.setItem('fichaPokemon', JSON.stringify(dados));
+  localStorage.setItem(chaveFicha(), JSON.stringify(dados));
 }
 
 function carregarDados() {
-  const raw = localStorage.getItem('fichaPokemon');
-  if (!raw) return;
-  const dados = JSON.parse(raw);
-  Object.keys(dados).forEach(k => {
-    const el = form.elements[k];
-    if (el) el.value = dados[k];
+  const raw = localStorage.getItem(chaveFicha());
+  const dados = raw ? JSON.parse(raw) : {};
+  // Preenche com os dados salvos e limpa o que não existir (evita vazar
+  // valores de uma ficha pra outra ao trocar de aba)
+  Array.from(form.elements).forEach((el) => {
+    if (!el.name) return;
+    el.value = Object.prototype.hasOwnProperty.call(dados, el.name) ? dados[el.name] : '';
   });
   // Re-trigger visual updates
   for (let i = 1; i <= 6; i++) {
@@ -768,6 +933,9 @@ form.addEventListener('change', salvarDados);
 
 // ---- INIT ----
 document.addEventListener('DOMContentLoaded', async () => {
+  renderSheetTabs();
+  document.getElementById('sheetTabAdd').addEventListener('click', novaFicha);
+
   await buildPartySlots();
   initFotoUpload();
   carregarDados();

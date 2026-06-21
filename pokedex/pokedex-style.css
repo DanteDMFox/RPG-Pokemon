@@ -8,6 +8,23 @@
   padding: 20px 20px 60px;
 }
 
+/* ---- BADGE DE FICHA ATIVA ---- */
+.pdx-active-sheet {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 auto 24px;
+  padding: 8px 16px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-gold);
+  border-radius: 999px;
+  color: var(--pokeyellow);
+  font-weight: 600;
+  font-size: 0.9rem;
+  width: fit-content;
+  justify-content: center;
+}
+
 /* ---- CONTROLS ---- */
 .pdx-controls {
   margin-bottom: 28px;
