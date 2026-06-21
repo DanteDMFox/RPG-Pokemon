@@ -308,6 +308,32 @@
   grid-column: 1 / -1;
 }
 
+/* ---- NOME E TIPO (somente leitura) ----
+   Vêm sempre da Pokédex; o jogador não edita, só o apelido. */
+.pokemon-name-display {
+  padding: 8px 11px;
+  font-size: 0.84rem;
+  font-weight: 700;
+  color: var(--text-offwhite);
+  background: rgba(255,255,255,0.04);
+  border: 2px solid rgba(255,255,255,0.08);
+  border-radius: var(--radius-sm);
+  min-height: 1.2em;
+}
+
+.pokemon-type-display {
+  display: flex;
+  align-items: center;
+  min-height: 38px;
+  padding: 4px 2px;
+}
+
+.type-badge-empty {
+  color: var(--text-gray);
+  font-size: 0.8rem;
+  padding: 3px 4px;
+}
+
 /* ---- VIDA (9 BOLINHAS) ---- */
 .hp-bubbles {
   display: flex;
@@ -706,4 +732,5 @@
   .stage-pip { border-color: #999; background: white; }
   .stage-pip.filled { background: #888 !important; border-color: #444 !important; }
   .stage-value { color: black !important; }
+  .pokemon-name-display { background: white; color: black; border-color: #aaa; }
 }

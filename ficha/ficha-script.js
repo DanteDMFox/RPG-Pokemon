@@ -401,8 +401,8 @@ function buildSlot(i) {
 
       <div>
         <div class="slot-field-label">Name</div>
-        <input type="text" name="pokemon${i}" id="pokemonName${i}"
-               placeholder="Pokémon name" class="pokemon-name-input">
+        <div class="pokemon-name-display" id="pokemonNameDisplay${i}">—</div>
+        <input type="hidden" name="pokemon${i}" id="pokemonName${i}">
       </div>
       <div>
         <div class="slot-field-label">Nickname</div>
@@ -412,17 +412,17 @@ function buildSlot(i) {
 
       <div>
         <div class="slot-field-label">Type 1</div>
-        <select name="type1_${i}" id="pokemonType1_${i}" class="pokemon-type-select">
-          <option value="">— Type —</option>
-          ${typeOptions}
-        </select>
+        <div class="pokemon-type-display" id="pokemonType1Display${i}">
+          <span class="type-badge-empty">—</span>
+        </div>
+        <input type="hidden" name="type1_${i}" id="pokemonType1_${i}">
       </div>
       <div>
         <div class="slot-field-label">Type 2</div>
-        <select name="type2_${i}" id="pokemonType2_${i}" class="pokemon-type-select">
-          <option value="">—</option>
-          ${typeOptions}
-        </select>
+        <div class="pokemon-type-display" id="pokemonType2Display${i}">
+          <span class="type-badge-empty">—</span>
+        </div>
+        <input type="hidden" name="type2_${i}" id="pokemonType2_${i}">
       </div>
 
       <div class="slot-level-row">
@@ -490,10 +490,20 @@ async function fillFromPokedex(i) {
 
   if (!id) {
     document.getElementById(`pokemonDexId${i}`).value = '';
+    document.getElementById(`pokemonName${i}`).value = '';
+    document.getElementById(`pokemonType1_${i}`).value = '';
+    document.getElementById(`pokemonType2_${i}`).value = '';
     partyAssignments[i] = null;
     hint.textContent = '';
+    updateSlotName(i);
+    updateSlotColor(i);
+    updateNameTypeDisplay(i);
+    const sprite = document.getElementById(`slotSprite${i}`);
+    sprite.style.display = 'none';
+    sprite.removeAttribute('src');
     populateCapturedDropdowns(); // libera o antigo pra farm/outros slots
     salvarPartyAssignments();
+    salvarDados();
     return;
   }
 
@@ -529,6 +539,7 @@ async function fillFromPokedex(i) {
     // Atualiza visuais dependentes
     updateSlotName(i);
     updateSlotColor(i);
+    updateNameTypeDisplay(i);
     populateCapturedDropdowns(); // remove esse pokémon dos outros dropdowns + atualiza farm
     salvarDados();
 
@@ -566,6 +577,28 @@ function updateSlotName(i) {
 
   const slot = document.getElementById(`slot-${i}`);
   slot.classList.toggle('has-pokemon', name.length > 0);
+}
+
+// ---- DISPLAY (somente leitura) do nome e dos tipos ----
+// O nome do Pokémon e os tipos vêm sempre da Pokédex (via fillFromPokedex);
+// não são editáveis pelo jogador, só o apelido é. Esta função espelha os
+// valores guardados nos campos hidden pros divs visuais de exibição.
+function updateNameTypeDisplay(i) {
+  const name     = document.getElementById(`pokemonName${i}`).value.trim();
+  const nameDisp = document.getElementById(`pokemonNameDisplay${i}`);
+  if (nameDisp) nameDisp.textContent = name || '—';
+
+  [1, 2].forEach(n => {
+    const typeVal  = document.getElementById(`pokemonType${n}_${i}`).value.trim();
+    const typeDisp = document.getElementById(`pokemonType${n}Display${i}`);
+    if (!typeDisp) return;
+    if (typeVal) {
+      const color = TYPE_COLORS[typeVal] || '#888';
+      typeDisp.innerHTML = `<span class="type-badge" style="background:${color}">${typeVal}</span>`;
+    } else {
+      typeDisp.innerHTML = `<span class="type-badge-empty">—</span>`;
+    }
+  });
 }
 
 // ---- ESTÁGIO EVOLUTIVO (marcado manualmente: Base Form / Stage 2 / Stage 3) ----
@@ -878,11 +911,23 @@ function carregarDados() {
   // Re-trigger visual updates
   for (let i = 1; i <= 6; i++) {
     updateSlotName(i);
+    updateNameTypeDisplay(i);
     renderEvoStage(i);
     updateStatusBadge(i);
     updateSlotColor(i);
     renderHpBubbles(i);
     renderAllStages(i);
+
+    // Restaura o sprite no header do slot, se houver Pokémon salvo
+    const dexId  = document.getElementById(`pokemonDexId${i}`)?.value;
+    const sprite = document.getElementById(`slotSprite${i}`);
+    if (dexId && sprite) {
+      sprite.src = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${dexId}.png`;
+      sprite.style.display = 'inline-block';
+    } else if (sprite) {
+      sprite.style.display = 'none';
+      sprite.removeAttribute('src');
+    }
   }
 }
 
