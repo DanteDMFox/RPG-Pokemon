@@ -17,7 +17,7 @@ function loadSheetsIndex() {
     if (Array.isArray(list) && list.length) return list;
   } catch { /* ignore */ }
   // Nenhuma ficha ainda: cria a primeira automaticamente
-  const first = { id: criarSheetId(), nome: 'Ficha 1' };
+  const first = { id: criarSheetId(), nome: 'Ficha 1', editado: false };
   salvarSheetsIndex([first]);
   return [first];
 }
@@ -28,6 +28,24 @@ function salvarSheetsIndex(list) {
 
 function criarSheetId() {
   return 'sheet_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+}
+
+// Acha o menor número N >= 1 tal que nenhuma ficha "não editada" (ainda no
+// nome padrão "Ficha N") esteja usando esse número. Fichas renomeadas
+// (editado === true) liberam seu número de volta pro próximo "Nova ficha".
+function proximoNumeroLivre() {
+  const usados = new Set(
+    sheetsIndex
+      .filter(s => !s.editado)
+      .map(s => {
+        const m = /^Ficha (\d+)$/.exec(s.nome);
+        return m ? parseInt(m[1], 10) : null;
+      })
+      .filter(n => n !== null)
+  );
+  let n = 1;
+  while (usados.has(n)) n++;
+  return n;
 }
 
 let sheetsIndex = loadSheetsIndex();
@@ -68,6 +86,9 @@ function renderSheetTabs() {
       const novoNome = nameSpan.textContent.trim() || 'Sem nome';
       nameSpan.textContent = novoNome;
       sheet.nome = novoNome;
+      // Considera "editada" qualquer ficha cujo nome não seja exatamente o
+      // padrão "Ficha N" — isso libera (ou ocupa) o número pra próxima criação.
+      sheet.editado = !/^Ficha \d+$/.test(novoNome);
       salvarSheetsIndex(sheetsIndex);
     });
     nameSpan.addEventListener('keydown', (e) => {
@@ -98,6 +119,29 @@ function renderSheetTabs() {
   });
 }
 
+// Sincroniza o nome da aba com o campo "Nome" (do treinador) do formulário.
+// Editar esse campo conta como "editar o nome do personagem" — a aba passa
+// a mostrar o nome digitado e libera o número "Ficha N" pra próxima criação.
+function sincronizarNomeAba() {
+  const nomeInput = document.getElementById('nome');
+  const sheet = sheetsIndex.find(s => s.id === activeSheetId);
+  if (!nomeInput || !sheet) return;
+
+  const novoNome = nomeInput.value.trim();
+  if (novoNome) {
+    sheet.nome = novoNome;
+    sheet.editado = !/^Ficha \d+$/.test(novoNome);
+  } else {
+    // Campo de nome vazio: volta a aba pro padrão "Ficha N" (próximo livre)
+    // só se ela ainda não tiver um nome manual diferente preservado.
+    if (!sheet.editado) return;
+    sheet.nome = `Ficha ${proximoNumeroLivre()}`;
+    sheet.editado = false;
+  }
+  salvarSheetsIndex(sheetsIndex);
+  renderSheetTabs();
+}
+
 function trocarFicha(sheetId) {
   salvarDados(); // garante que a ficha atual não perde edições pendentes
   activeSheetId = sheetId;
@@ -107,7 +151,8 @@ function trocarFicha(sheetId) {
 
 async function novaFicha() {
   salvarDados();
-  const novo = { id: criarSheetId(), nome: `Ficha ${sheetsIndex.length + 1}` };
+  const numero = proximoNumeroLivre();
+  const novo = { id: criarSheetId(), nome: `Ficha ${numero}`, editado: false };
   sheetsIndex.push(novo);
   salvarSheetsIndex(sheetsIndex);
   activeSheetId = novo.id;
@@ -1018,6 +1063,9 @@ form.addEventListener('reset', () => {
 
 // ---- AUTO SAVE on any change ----
 form.addEventListener('change', salvarDados);
+
+// ---- NOME DO TREINADOR → sincroniza nome da aba ----
+document.getElementById('nome').addEventListener('blur', sincronizarNomeAba);
 
 // ---- INIT ----
 document.addEventListener('DOMContentLoaded', async () => {
