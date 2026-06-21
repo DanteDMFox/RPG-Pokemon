@@ -5,7 +5,7 @@
 .ficha-container {
   max-width: 860px;
   margin: 0 auto;
-  padding: 20px 20px 60px;
+  padding: 14px 20px 50px;
 }
 
 /* ---- ABAS DE FICHAS (múltiplos personagens / NPCs) ---- */
@@ -13,7 +13,7 @@
   display: flex;
   align-items: flex-end;
   gap: 6px;
-  margin-bottom: 24px;
+  margin-bottom: 18px;
   border-bottom: 2px solid var(--bg-surface);
   overflow-x: auto;
   scrollbar-width: thin;
@@ -29,17 +29,17 @@
 .sheet-tab {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 10px 14px;
+  gap: 7px;
+  padding: 8px 12px;
   background: var(--bg-card);
   border: 2px solid var(--bg-surface);
   border-bottom: none;
-  border-radius: 10px 10px 0 0;
+  border-radius: 9px 9px 0 0;
   color: var(--text-gray);
   cursor: pointer;
   white-space: nowrap;
   font-weight: 600;
-  font-size: 0.92rem;
+  font-size: 0.84rem;
   transition: background 0.15s, color 0.15s;
   flex-shrink: 0;
   max-width: 200px;
@@ -113,14 +113,14 @@
 .foto-wrapper {
   display: flex;
   justify-content: center;
-  margin-bottom: 28px;
+  margin-bottom: 18px;
 }
 
 .foto-area {
   position: relative;
-  width: 160px;
-  height: 200px;
-  border-radius: var(--radius-md);
+  width: 128px;
+  aspect-ratio: var(--card-aspect);
+  border-radius: var(--radius-card);
   border: 3px dashed rgba(255,255,255,0.2);
   cursor: pointer;
   overflow: hidden;
@@ -137,15 +137,15 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 10px;
+  gap: 8px;
   height: 100%;
   color: var(--text-gray);
-  font-size: 0.8rem;
+  font-size: 0.74rem;
   text-align: center;
-  padding: 16px;
+  padding: 12px;
   pointer-events: none;
 }
-.foto-icon { font-size: 2.4rem; }
+.foto-icon { font-size: 2rem; }
 
 .foto-preview {
   width: 100%;
@@ -176,51 +176,75 @@
 /* ---- POKEMON PARTY SLOTS ---- */
 .pokemon-party-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
-  gap: 16px;
+  grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+  gap: 12px;
 }
 
 .pokemon-slot {
-  background: rgba(255,255,255,0.04);
-  border: 2px solid rgba(255,255,255,0.10);
-  border-radius: var(--radius-md);
-  padding: 16px;
+  --slot-accent: var(--pokegray);
+  background: rgba(255,255,255,0.03);
+  border: 2px solid var(--tcg-frame-lite);
+  border-radius: var(--radius-card);
+  padding: 5px;
   transition: var(--transition);
   position: relative;
+  overflow: hidden;
 }
-.pokemon-slot:hover { border-color: rgba(255,255,255,0.22); }
+.pokemon-slot::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(120deg,
+    var(--tcg-holo-1) 0%, transparent 25%,
+    var(--tcg-holo-2) 50%, transparent 75%,
+    var(--tcg-holo-3) 100%);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  pointer-events: none;
+  mix-blend-mode: screen;
+}
+.pokemon-slot:hover { border-color: var(--slot-accent); }
 
 .pokemon-slot.has-pokemon {
-  border-color: rgba(248,208,48,0.3);
-  background: rgba(248,208,48,0.04);
+  border-color: var(--slot-accent);
+}
+.pokemon-slot.has-pokemon::before { opacity: 0.45; }
+
+.slot-card-inner {
+  position: relative;
+  z-index: 1;
+  background: linear-gradient(165deg, rgba(255,255,255,0.025) 0%, transparent 100%);
+  border: 2px solid var(--slot-accent);
+  border-radius: calc(var(--radius-card) - 5px);
+  padding: 10px 12px;
 }
 
 .slot-header {
   display: flex;
   align-items: center;
-  gap: 12px;
-  margin-bottom: 14px;
-  padding-bottom: 12px;
+  gap: 10px;
+  margin-bottom: 10px;
+  padding-bottom: 8px;
   border-bottom: 1px solid rgba(255,255,255,0.08);
 }
 
 .slot-header-text {
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: 2px;
   min-width: 0;
 }
 
 .slot-number {
   font-family: 'Press Start 2P', monospace;
-  font-size: 0.52rem;
-  color: var(--pokeyellow);
-  opacity: 0.8;
+  font-size: 0.48rem;
+  color: var(--slot-accent);
+  opacity: 0.95;
 }
 
 .slot-name {
   font-weight: 800;
-  font-size: 1.02rem;
+  font-size: 0.92rem;
   color: var(--text-white);
   text-transform: capitalize;
   line-height: 1.2;
@@ -230,20 +254,21 @@
 }
 
 .slot-sprite {
-  width: 64px;
-  height: 64px;
+  width: 46px;
+  height: 46px;
   object-fit: contain;
   image-rendering: pixelated;
   flex-shrink: 0;
-  background: rgba(255,255,255,0.04);
+  background: radial-gradient(ellipse at 50% 35%, rgba(255,255,255,0.08), transparent 70%), rgba(255,255,255,0.04);
   border-radius: var(--radius-sm);
+  border: 1px solid rgba(255,255,255,0.08);
 }
 
 /* ---- Dropdown de Pokémon capturados ---- */
 .pokemon-select-captured {
   width: 100%;
-  padding: 9px 12px;
-  font-size: 0.85rem;
+  padding: 8px 11px;
+  font-size: 0.82rem;
   border: 2px solid rgba(248,208,48,0.3);
   background: rgba(248,208,48,0.06);
 }
@@ -256,26 +281,26 @@
 }
 
 .select-hint {
-  font-size: 0.7rem;
+  font-size: 0.66rem;
   color: var(--text-gray);
-  margin-top: 5px;
-  min-height: 14px;
+  margin-top: 4px;
+  min-height: 13px;
 }
 
 .slot-fields {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 10px;
-  margin-bottom: 10px;
+  gap: 8px;
+  margin-bottom: 8px;
 }
 
 .slot-field-label {
-  font-size: 0.68rem;
+  font-size: 0.64rem;
   font-weight: 700;
   color: var(--text-gray);
   text-transform: uppercase;
-  letter-spacing: 0.08em;
-  margin-bottom: 4px;
+  letter-spacing: 0.07em;
+  margin-bottom: 3px;
 }
 
 /* Nível / barra de evolução */
@@ -286,14 +311,14 @@
 /* ---- VIDA (9 BOLINHAS) ---- */
 .hp-bubbles {
   display: flex;
-  gap: 6px;
+  gap: 5px;
   flex-wrap: wrap;
-  margin-top: 4px;
+  margin-top: 3px;
 }
 
 .hp-bubble {
-  width: 26px;
-  height: 26px;
+  width: 22px;
+  height: 22px;
   border-radius: 50%;
   border: 2px solid rgba(255,255,255,0.25);
   background: rgba(255,255,255,0.04);
@@ -316,16 +341,13 @@
 
 .hp-count {
   display: inline-block;
-  margin-top: 8px;
+  margin-top: 6px;
   font-family: 'Press Start 2P', monospace;
-  font-size: 0.6rem;
+  font-size: 0.56rem;
   color: var(--pokeyellow);
 }
 
-.pokemon-slot.fainted {
-  border-color: rgba(204,0,0,0.4);
-  background: rgba(204,0,0,0.05);
-}
+.pokemon-slot.fainted { --slot-accent: var(--pokered-lite); }
 .pokemon-slot.fainted .hp-count {
   color: var(--pokered-lite);
 }
@@ -397,8 +419,8 @@
 
 .farm-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
-  gap: 12px;
+  grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+  gap: 9px;
 }
 
 .farm-empty {
@@ -413,36 +435,43 @@
 }
 
 .farm-card {
-  background: rgba(255,255,255,0.04);
-  border: 2px solid rgba(255,255,255,0.10);
-  border-radius: var(--radius-md);
-  padding: 10px 8px 12px;
+  position: relative;
+  background: var(--tcg-frame);
+  border: 2px solid var(--tcg-frame-lite);
+  border-radius: 9px;
+  padding: 3px;
   text-align: center;
   transition: var(--transition);
 }
 .farm-card:hover {
-  border-color: rgba(248,208,48,0.4);
-  background: rgba(248,208,48,0.05);
-  transform: translateY(-2px);
+  border-color: var(--pokeyellow);
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-sm);
+}
+.farm-card-inner {
+  background: linear-gradient(165deg, rgba(255,255,255,0.025) 0%, transparent 100%);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 6px;
+  padding: 7px 4px 8px;
 }
 
 .farm-card img {
-  width: 64px;
-  height: 64px;
+  width: 52px;
+  height: 52px;
   object-fit: contain;
   image-rendering: pixelated;
-  margin-bottom: 4px;
+  margin-bottom: 3px;
 }
 
 .farm-card-num {
   font-family: 'Press Start 2P', monospace;
-  font-size: 0.5rem;
+  font-size: 0.44rem;
   color: var(--pokeyellow);
-  margin-bottom: 3px;
+  margin-bottom: 2px;
 }
 
 .farm-card-name {
-  font-size: 0.78rem;
+  font-size: 0.7rem;
   font-weight: 700;
   color: var(--text-white);
   text-transform: capitalize;

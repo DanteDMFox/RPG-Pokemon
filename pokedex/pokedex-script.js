@@ -141,6 +141,10 @@ function makeCard(p) {
   card.className   = 'pdx-card' + (isCap ? ' captured' : '');
   card.dataset.id  = p.id;
 
+  const primaryType = p.types[0]?.type.name;
+  const accentColor = TYPE_COLORS[primaryType] || '#888';
+  card.style.setProperty('--card-type-color', accentColor);
+
   const imgSrc = p.sprites?.other?.['official-artwork']?.front_default
               || p.sprites?.front_default
               || `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${p.id}.png`;
@@ -150,11 +154,13 @@ function makeCard(p) {
   ).join('');
 
   card.innerHTML = `
-    <div class="pdx-card-num">#${String(p.id).padStart(3, '0')}</div>
-    <img class="pdx-card-img" src="${imgSrc}" alt="${p.name}" loading="lazy"
-         onerror="this.src='https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${p.id}.png'">
-    <div class="pdx-card-name">${p.name}</div>
-    <div class="pdx-card-types">${types}</div>
+    <div class="pdx-card-inner">
+      <div class="pdx-card-num">#${String(p.id).padStart(3, '0')}</div>
+      <img class="pdx-card-img" src="${imgSrc}" alt="${p.name}" loading="lazy"
+           onerror="this.src='https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${p.id}.png'">
+      <div class="pdx-card-name">${p.name}</div>
+      <div class="pdx-card-types">${types}</div>
+    </div>
   `;
   card.addEventListener('click', () => openModal(p));
   return card;

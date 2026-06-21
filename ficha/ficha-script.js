@@ -351,9 +351,11 @@ function renderFarm() {
     const img = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${p.id}.png`;
     return `
       <div class="farm-card" data-id="${p.id}">
-        <img src="${img}" alt="${p.name || ''}" loading="lazy">
-        <div class="farm-card-num">#${String(p.id).padStart(3,'0')}</div>
-        <div class="farm-card-name">${p.name ? capitalize(p.name) : '...'}</div>
+        <div class="farm-card-inner">
+          <img src="${img}" alt="${p.name || ''}" loading="lazy">
+          <div class="farm-card-num">#${String(p.id).padStart(3,'0')}</div>
+          <div class="farm-card-name">${p.name ? capitalize(p.name) : '...'}</div>
+        </div>
       </div>
     `;
   }).join('');
@@ -378,6 +380,7 @@ function buildSlot(i) {
   div.className = 'pokemon-slot';
   div.id = `slot-${i}`;
   div.innerHTML = `
+    <div class="slot-card-inner">
     <div class="slot-header">
       <img class="slot-sprite" id="slotSprite${i}" style="display:none" alt="">
       <div class="slot-header-text">
@@ -447,6 +450,7 @@ function buildSlot(i) {
         <div class="slot-field-label">📊 Estágios de Batalha</div>
         <div class="stage-tracker-grid" id="stageTracker${i}"></div>
       </div>
+    </div>
     </div>
   `;
   return div;
@@ -766,12 +770,9 @@ function updateSlotColor(i) {
   const type = document.getElementById(`pokemonType1_${i}`).value;
   const slot  = document.getElementById(`slot-${i}`);
   if (type && TYPE_COLORS[type]) {
-    const c = TYPE_COLORS[type];
-    slot.style.borderColor = c + '66';
-    slot.style.background  = `linear-gradient(135deg, ${c}18 0%, rgba(255,255,255,0.03) 100%)`;
+    slot.style.setProperty('--slot-accent', TYPE_COLORS[type]);
   } else {
-    slot.style.borderColor = '';
-    slot.style.background  = '';
+    slot.style.removeProperty('--slot-accent');
   }
 }
 

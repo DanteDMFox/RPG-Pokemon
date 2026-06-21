@@ -18,8 +18,8 @@
   --pokegray-lite:#F5F5F5;
 
   /* Game-UI tones */
-  --bg-page:      #1A1A2E;
-  --bg-card:      #16213E;
+  --bg-page:      #14141F;
+  --bg-card:      #1B2236;
   --bg-surface:   #0F3460;
   --border-gold:  #E8C841;
   --border-silver:#B8C0CC;
@@ -27,6 +27,14 @@
   --text-offwhite:#E8E8E8;
   --text-gray:    #A0A0B0;
   --text-dark:    #1A1A2E;
+
+  /* TCG card system */
+  --tcg-frame:      #2A2438;
+  --tcg-frame-lite: #3A3250;
+  --tcg-holo-1:     rgba(255,204,0,0.22);
+  --tcg-holo-2:     rgba(91,109,224,0.20);
+  --tcg-holo-3:     rgba(255,68,68,0.16);
+  --card-aspect:    0.716; /* proporção largura/altura de uma carta TCG real */
 
   /* Type colors */
   --t-normal:   #A8A878;
@@ -49,16 +57,17 @@
   --t-fairy:    #EE99AC;
 
   --radius-sm:  6px;
-  --radius-md:  12px;
-  --radius-lg:  20px;
-  --radius-xl:  32px;
+  --radius-md:  10px;
+  --radius-lg:  16px;
+  --radius-xl:  28px;
+  --radius-card: 14px;
 
   --shadow-sm:  0 2px 8px rgba(0,0,0,0.4);
-  --shadow-md:  0 4px 20px rgba(0,0,0,0.5);
-  --shadow-lg:  0 8px 40px rgba(0,0,0,0.6);
-  --shadow-gold: 0 0 20px rgba(232, 200, 65, 0.3);
+  --shadow-md:  0 4px 16px rgba(0,0,0,0.45);
+  --shadow-lg:  0 8px 32px rgba(0,0,0,0.55);
+  --shadow-gold: 0 0 16px rgba(232, 200, 65, 0.28);
 
-  --transition: 0.2s ease;
+  --transition: 0.16s ease;
 }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -92,7 +101,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  height: 64px;
+  height: 54px;
   gap: 12px;
 }
 
@@ -110,9 +119,9 @@ body {
 }
 
 .navbar-brand .pokeball-icon {
-  width: 32px;
-  height: 32px;
-  background: linear-gradient(180deg, red 50%, white 50%);
+  width: 26px;
+  height: 26px;
+  background: linear-gradient(180deg, white 50%, black 50%);
   border-radius: 50%;
   border: 2px solid black;
   position: relative;
@@ -134,8 +143,8 @@ body {
   position: absolute;
   top: 50%;
   left: 50%;
-  width: 10px;
-  height: 10px;
+  width: 8px;
+  height: 8px;
   background: white;
   border: 2px solid black;
   border-radius: 50%;
@@ -154,12 +163,12 @@ body {
   display: flex;
   align-items: center;
   gap: 6px;
-  padding: 8px 14px;
+  padding: 7px 12px;
   border-radius: var(--radius-md);
   text-decoration: none;
   color: rgba(255,255,255,0.85);
   font-weight: 700;
-  font-size: 0.85rem;
+  font-size: 0.82rem;
   transition: var(--transition);
   border: 2px solid transparent;
   white-space: nowrap;
@@ -179,19 +188,19 @@ body {
 /* ---- PAGE HEADER ---- */
 .page-hero {
   text-align: center;
-  padding: 40px 20px 30px;
+  padding: 26px 20px 20px;
 }
 .page-hero h1 {
   font-family: 'Press Start 2P', monospace;
-  font-size: clamp(1rem, 3vw, 1.6rem);
+  font-size: clamp(0.9rem, 2.6vw, 1.35rem);
   color: var(--pokeyellow);
-  text-shadow: 3px 3px 0 var(--pokered-dark), 0 0 30px rgba(248,208,48,0.4);
+  text-shadow: 3px 3px 0 var(--pokered-dark), 0 0 24px rgba(248,208,48,0.35);
   margin-bottom: 8px;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.04em;
 }
 .page-hero p {
   color: var(--text-gray);
-  font-size: 0.95rem;
+  font-size: 0.88rem;
 }
 
 /* ---- SECTION / CARD ---- */
@@ -199,8 +208,8 @@ body {
   background: linear-gradient(135deg, var(--bg-card) 0%, #1a2744 100%);
   border: 2px solid rgba(255,255,255,0.08);
   border-radius: var(--radius-lg);
-  padding: 28px;
-  margin-bottom: 24px;
+  padding: 20px 22px;
+  margin-bottom: 18px;
   position: relative;
   overflow: hidden;
 }
@@ -214,11 +223,11 @@ body {
 
 .section-title {
   font-family: 'Press Start 2P', monospace;
-  font-size: 0.7rem;
+  font-size: 0.64rem;
   color: var(--pokeyellow);
   text-transform: uppercase;
-  letter-spacing: 0.1em;
-  margin-bottom: 22px;
+  letter-spacing: 0.08em;
+  margin-bottom: 16px;
   display: flex;
   align-items: center;
   gap: 10px;
@@ -242,24 +251,24 @@ body {
 /* ---- FORM ELEMENTS ---- */
 .form-row {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-  gap: 16px;
-  margin-bottom: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 12px;
+  margin-bottom: 12px;
 }
 
 .form-group {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 5px;
 }
 .form-group.full-width { grid-column: 1 / -1; }
 
 label {
-  font-size: 0.78rem;
+  font-size: 0.74rem;
   font-weight: 700;
   color: var(--text-gray);
   text-transform: uppercase;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.07em;
 }
 
 input[type="text"],
@@ -272,9 +281,9 @@ textarea {
   border-radius: var(--radius-sm);
   color: var(--text-white);
   font-family: 'Nunito', sans-serif;
-  font-size: 0.92rem;
+  font-size: 0.88rem;
   font-weight: 600;
-  padding: 10px 14px;
+  padding: 8px 12px;
   transition: var(--transition);
   width: 100%;
   outline: none;
@@ -293,7 +302,7 @@ select option {
   color: var(--text-white);
 }
 
-textarea { resize: vertical; min-height: 80px; }
+textarea { resize: vertical; min-height: 70px; }
 
 /* ---- BUTTONS ---- */
 .btn {
@@ -301,10 +310,10 @@ textarea { resize: vertical; min-height: 80px; }
   align-items: center;
   justify-content: center;
   gap: 8px;
-  padding: 12px 22px;
+  padding: 10px 18px;
   border-radius: var(--radius-md);
   font-family: 'Press Start 2P', monospace;
-  font-size: 0.6rem;
+  font-size: 0.58rem;
   font-weight: 400;
   text-decoration: none;
   cursor: pointer;
@@ -388,10 +397,164 @@ textarea { resize: vertical; min-height: 80px; }
   text-shadow: 1px 1px 2px rgba(0,0,0,0.4);
 }
 
+/* ============================================
+   TCG CARD SYSTEM
+   Cartão inspirado no design das cartas Pokémon TCG:
+   moldura dupla, faixa holo sutil, ilustração + rodapé
+   de tipo. Use --tcg-accent pra colorir cada instância.
+   ============================================ */
+.tcg-card {
+  --tcg-accent: var(--pokeyellow);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  background: var(--tcg-frame);
+  border-radius: var(--radius-card);
+  padding: 6px;
+  text-decoration: none;
+  overflow: hidden;
+  box-shadow: var(--shadow-md);
+  border: 2px solid var(--tcg-frame-lite);
+  transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+}
+.tcg-card:hover,
+.tcg-card:focus-visible {
+  transform: translateY(-5px) scale(1.015);
+  box-shadow: 0 14px 36px rgba(0,0,0,0.5), 0 0 0 1px var(--tcg-accent);
+  border-color: var(--tcg-accent);
+}
+.tcg-card:focus-visible { outline: 3px solid var(--tcg-accent); outline-offset: 2px; }
+
+/* Verniz holográfico sutil, fixo (não acompanha o mouse) pra não pesar no mobile */
+.tcg-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(120deg,
+    var(--tcg-holo-1) 0%, transparent 25%,
+    var(--tcg-holo-2) 50%, transparent 75%,
+    var(--tcg-holo-3) 100%);
+  opacity: 0.5;
+  pointer-events: none;
+  mix-blend-mode: screen;
+}
+
+.tcg-card-inner {
+  position: relative;
+  z-index: 1;
+  background: linear-gradient(165deg, var(--bg-card) 0%, #161c2e 100%);
+  border: 2px solid var(--tcg-accent);
+  border-radius: calc(var(--radius-card) - 6px);
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  overflow: hidden;
+}
+
+.tcg-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 8px 10px 4px;
+}
+
+.tcg-card-eyebrow {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.52rem;
+  color: var(--tcg-accent);
+  letter-spacing: 0.08em;
+  white-space: nowrap;
+}
+
+.tcg-card-hp {
+  font-size: 0.7rem;
+  font-weight: 800;
+  color: var(--text-offwhite);
+  white-space: nowrap;
+}
+
+.tcg-card-art {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  margin: 2px 10px 0;
+  border-radius: 8px;
+  background: radial-gradient(ellipse at 50% 35%, rgba(255,255,255,0.08), transparent 70%), var(--bg-surface);
+  border: 1px solid rgba(255,255,255,0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+.tcg-card-art img {
+  width: 78%;
+  height: 78%;
+  object-fit: contain;
+  filter: drop-shadow(0 6px 10px rgba(0,0,0,0.5));
+}
+.tcg-card-art .tcg-card-icon-fallback {
+  font-size: 2.6rem;
+}
+
+.tcg-card-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 10px 12px 4px;
+}
+.tcg-card-body h2,
+.tcg-card-body h3 {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.74rem;
+  color: var(--text-white);
+  letter-spacing: 0.02em;
+  line-height: 1.4;
+}
+.tcg-card-body p {
+  color: var(--text-gray);
+  font-size: 0.78rem;
+  line-height: 1.45;
+}
+
+.tcg-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 8px 12px 10px;
+  margin-top: auto;
+}
+.tcg-card-cta {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.7rem;
+  font-weight: 800;
+  color: var(--tcg-accent);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.tcg-card-cta .arrow { transition: transform 0.18s ease; }
+.tcg-card:hover .tcg-card-cta .arrow { transform: translateX(3px); }
+
+.tcg-card-type-pip {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  background: var(--tcg-accent);
+  box-shadow: 0 0 0 2px rgba(0,0,0,0.3) inset;
+  flex-shrink: 0;
+}
+
 /* ---- RESPONSIVE ---- */
 @media (max-width: 600px) {
   .navbar-brand span { display: none; }
-  .navbar-nav a { padding: 8px 10px; font-size: 0.75rem; }
-  .section { padding: 18px; }
+  .navbar-nav a { padding: 7px 9px; font-size: 0.74rem; }
+  .section { padding: 16px; }
   .form-row { grid-template-columns: 1fr; }
 }
