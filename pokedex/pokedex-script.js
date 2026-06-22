@@ -155,7 +155,7 @@ function makeCard(p) {
     <div class="pdx-card-inner">
       <div class="pdx-card-num">#${String(p.id).padStart(3, '0')}</div>
       <img class="pdx-card-img" src="${imgSrc}" alt="${p.name}" loading="lazy"
-           onerror="this.src='https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${p.id}.png'">
+           onerror="window.spriteFallback(this)">
       <div class="pdx-card-name">${p.name}</div>
       <div class="pdx-card-types">${types}</div>
     </div>
@@ -222,7 +222,7 @@ async function openModal(p) {
       <div class="modal-pokemon-image">
         <img src="${getThemeSpriteUrl(p.id, p.sprites)}"
              alt="${p.name}"
-             onerror="this.src='https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${p.id}.png'">
+             onerror="window.spriteFallback(this)">
       </div>
       <div class="modal-pokemon-name">#${String(p.id).padStart(3,'0')} ${p.name}</div>
 

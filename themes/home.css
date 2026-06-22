@@ -1,0 +1,267 @@
+/* ============================================
+   TEMA: 3D MODERNO — era Pokémon Home / Scarlet-Violet
+   Estética do app Pokémon Home: fundo branco-acinzentado quente, acentos
+   em laranja/coral vibrante (as cores do app), cantos generosamente
+   arredondados, sombras suaves e difusas, tipografia clean sem serifas.
+   É o tema mais "moderno" e luminoso — o oposto visual do DS escuro.
+   Sprites: renders 3D do Pokémon Home (os mais detalhados disponíveis).
+   ============================================ */
+
+[data-theme="home"] {
+  /* Fundos claros/quentes — como o app Home */
+  --bg-page:      #F2F3F5;
+  --bg-card:      #FFFFFF;
+  --bg-surface:   #E8E9EC;
+
+  /* Laranja/coral vibrante — cor de destaque do Pokémon Home */
+  --pokered:       #FF6B35;
+  --pokered-dark:  #E05520;
+  --pokered-lite:  #FF8C5C;
+  --pokeyellow:    #FFB830;
+
+  --border-gold:   #FF6B35;
+  --border-silver: #C8CAD0;
+
+  --text-white:    #1A1A2E;
+  --text-offwhite: #3A3A52;
+  --text-gray:     #888A96;
+  --text-dark:     #F2F3F5;
+
+  /* Cards limpos, brancos */
+  --tcg-frame:      #FFFFFF;
+  --tcg-frame-lite: #E0E2E8;
+  --tcg-holo-1:     rgba(255,107,53,0.06);
+  --tcg-holo-2:     rgba(255,184,48,0.05);
+  --tcg-holo-3:     rgba(255,107,53,0.03);
+
+  /* Cantos muito arredondados — design contemporâneo */
+  --radius-sm:   8px;
+  --radius-md:  12px;
+  --radius-lg:  18px;
+  --radius-xl:  24px;
+  --radius-card: 18px;
+
+  /* Sombras suaves e difusas — não há sombra dura no design moderno */
+  --shadow-sm:  0 2px 8px rgba(0,0,0,0.08);
+  --shadow-md:  0 4px 16px rgba(0,0,0,0.1);
+  --shadow-lg:  0 8px 32px rgba(0,0,0,0.12);
+  --shadow-gold: 0 0 0 3px rgba(255,107,53,0.25);
+
+  --transition: 0.18s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* ---- TIPOGRAFIA: sem Press Start 2P (não é pixelado) ----
+   O tema moderno usa Nunito em tudo — sem bitmap font. Só o nome do
+   Pokémon no modal grande mantém algo de diferente (peso pesado e maior). */
+[data-theme="home"] h1,
+[data-theme="home"] h2,
+[data-theme="home"] h3,
+[data-theme="home"] .section-title,
+[data-theme="home"] .subsection-title,
+[data-theme="home"] .modal-pokemon-name,
+[data-theme="home"] .page-hero h1 {
+  font-family: 'Nunito', sans-serif;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+}
+
+[data-theme="home"] .navbar-brand span {
+  font-family: 'Nunito', sans-serif;
+  font-weight: 900;
+  font-size: 1rem;
+}
+
+/* ---- FUNDO DA PÁGINA ---- */
+[data-theme="home"] body {
+  background: var(--bg-page);
+}
+
+/* ---- NAVBAR clara e limpa ---- */
+[data-theme="home"] .navbar {
+  background: #FFFFFF;
+  border-bottom: 2px solid var(--tcg-frame-lite);
+  box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+}
+
+[data-theme="home"] .navbar-brand span {
+  color: var(--pokered);
+}
+
+[data-theme="home"] .pokeball-icon {
+  border-color: var(--pokered);
+  background: var(--pokered);
+}
+
+[data-theme="home"] .navbar-nav a {
+  color: var(--text-offwhite);
+}
+
+[data-theme="home"] .navbar-nav a:hover,
+[data-theme="home"] .navbar-nav a.active {
+  background: rgba(255,107,53,0.1);
+  border-color: rgba(255,107,53,0.4);
+  color: var(--pokered);
+}
+
+/* ---- CARDS: brancos com sombra suave ---- */
+[data-theme="home"] .section {
+  background: #FFFFFF;
+  border-color: var(--tcg-frame-lite);
+  box-shadow: var(--shadow-sm);
+}
+
+[data-theme="home"] .pdx-card,
+[data-theme="home"] .item-card {
+  background: #FFFFFF;
+  border: 2px solid var(--tcg-frame-lite);
+}
+
+[data-theme="home"] .pdx-card-inner,
+[data-theme="home"] .item-card-inner {
+  background: #FFFFFF;
+  border-color: var(--tcg-frame-lite);
+}
+
+[data-theme="home"] .pdx-card-name,
+[data-theme="home"] .item-card-name {
+  color: var(--text-offwhite);
+  font-family: 'Nunito', sans-serif;
+  font-weight: 800;
+}
+
+[data-theme="home"] .pdx-card-num {
+  color: var(--text-gray);
+}
+
+/* Hover mais "bounce" graças ao cubic-bezier na --transition */
+[data-theme="home"] .pdx-card:hover {
+  border-color: var(--pokered);
+  box-shadow: 0 12px 32px rgba(255,107,53,0.18), 0 0 0 1px var(--pokered);
+  transform: translateY(-6px) scale(1.02);
+}
+
+/* ---- HOLO: leve reflexo iridescente (estilo render 3D) ---- */
+[data-theme="home"] .pdx-card::before,
+[data-theme="home"] .item-card::before {
+  opacity: 0.5;
+  background: linear-gradient(135deg,
+    rgba(255,107,53,0.12) 0%, transparent 30%,
+    rgba(255,184,48,0.1) 60%, transparent 100%);
+}
+
+/* ---- RENDERS 3D: não pixelizar, deixar suaves ---- */
+[data-theme="home"] img.pdx-card-img,
+[data-theme="home"] .modal-pokemon-image img,
+[data-theme="home"] .tcg-card-art img {
+  image-rendering: auto;
+  filter: drop-shadow(0 4px 12px rgba(0,0,0,0.15));
+}
+
+/* Render 3D no modal fica maior — merece destaque */
+[data-theme="home"] .modal-pokemon-image img {
+  filter: drop-shadow(0 8px 24px rgba(0,0,0,0.18));
+  transform: scale(1.08);
+}
+
+/* ---- MODAL clara ---- */
+[data-theme="home"] .pdx-modal-content,
+[data-theme="home"] .theme-modal-content {
+  background: #FFFFFF;
+  border-color: var(--tcg-frame-lite);
+  color: var(--text-offwhite);
+}
+
+[data-theme="home"] .pdx-modal-close,
+[data-theme="home"] .theme-modal-close {
+  background: var(--bg-surface);
+  color: var(--text-offwhite);
+}
+
+[data-theme="home"] .pdx-modal-close:hover,
+[data-theme="home"] .theme-modal-close:hover {
+  background: var(--pokered);
+  color: #fff;
+}
+
+[data-theme="home"] .modal-pokemon-name {
+  color: var(--pokered);
+  text-shadow: none;
+}
+
+[data-theme="home"] .detail-label {
+  color: var(--text-gray);
+}
+
+[data-theme="home"] .detail-value {
+  color: var(--text-offwhite);
+}
+
+/* ---- INPUTS E SELECTS ---- */
+[data-theme="home"] input,
+[data-theme="home"] select,
+[data-theme="home"] textarea {
+  background: var(--bg-surface);
+  border-color: var(--tcg-frame-lite);
+  color: var(--text-offwhite);
+}
+
+[data-theme="home"] input:focus,
+[data-theme="home"] select:focus,
+[data-theme="home"] textarea:focus {
+  border-color: var(--pokered);
+  box-shadow: 0 0 0 3px rgba(255,107,53,0.15);
+}
+
+/* ---- BOTÕES ---- */
+[data-theme="home"] .btn {
+  box-shadow: var(--shadow-sm);
+}
+
+/* ---- FICHA: labels e títulos claros ---- */
+[data-theme="home"] .section-title {
+  color: var(--pokered);
+  text-shadow: none;
+}
+
+[data-theme="home"] .subsection-title {
+  color: var(--text-offwhite);
+}
+
+[data-theme="home"] label {
+  color: var(--text-gray);
+}
+
+/* ---- POKÉDEX: barra de busca e filtro ---- */
+[data-theme="home"] .pdx-search,
+[data-theme="home"] .pdx-type-filter {
+  background: #FFFFFF;
+  border-color: var(--tcg-frame-lite);
+  color: var(--text-offwhite);
+}
+
+/* ---- ABAS DE FICHA ---- */
+[data-theme="home"] .sheet-tabs-wrapper {
+  background: #FFFFFF;
+  border-bottom-color: var(--tcg-frame-lite);
+}
+
+[data-theme="home"] .sheet-tab {
+  background: var(--bg-surface);
+  border-color: var(--tcg-frame-lite);
+  color: var(--text-gray);
+}
+
+[data-theme="home"] .sheet-tab.active {
+  background: #FFFFFF;
+  border-color: var(--pokered);
+  color: var(--pokered);
+}
+
+/* ---- SPRITES DE ITENS: filtro pro tema 3D Moderno ----
+   Sem filtro de cor (itens já são coloridos), só sombra suave pra
+   combinar com o visual limpo e elevado do tema. */
+[data-theme="home"] .item-card-img,
+[data-theme="home"] .ball-counter-img,
+[data-theme="home"] .modal-item-image img {
+  filter: drop-shadow(0 3px 8px rgba(0,0,0,0.15));
+}

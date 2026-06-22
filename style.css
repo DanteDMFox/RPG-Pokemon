@@ -559,14 +559,10 @@ textarea { resize: vertical; min-height: 70px; }
   .form-row { grid-template-columns: 1fr; }
 }
 
-/* ============================================
-   MOLDURA DE HARDWARE (frame por tema)
-   document.documentElement recebe [data-frame="gbc|gba|ds|none"] via
-   theme-engine.js, independente de [data-theme]. Cada tema com moldura
-   (GBC, GBA, DS) vai definir as regras de [data-frame="<id>"] no seu
-   próprio themes/<id>.css — este bloco aqui é só a base neutra (sem
-   moldura), que é o estado padrão (TCG e 3D Moderno).
-   ============================================ */
-[data-frame="none"] {
-  /* sem moldura — layout normal, nada a fazer */
+/* ---- SPRITE FALLBACK (Pokémon sem sprite na geração do tema ativo) ---- */
+.sprite-not-found {
+  opacity: 0.45;
+  filter: grayscale(0.3);
+  padding: 12%;
+  box-sizing: border-box;
 }

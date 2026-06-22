@@ -1,0 +1,124 @@
+/* ============================================
+   TEMA: GAME BOY ADVANCE
+   Inspirado na era Fire Red/Leaf Green: corpo "Indigo" violeta-azulado do
+   aparelho, tela horizontal larga, cantos levemente mais suaves que o GBC
+   (o GBA já tinha um design mais "tecnológico"), e paleta um pouco mais
+   fria/saturada. Segue a mesma convenção estrutural do tema GBC — variáveis
+   de cor/fonte aqui, moldura física no bloco [data-frame="gba"] no fim
+   deste arquivo.
+   ============================================ */
+
+[data-theme="gba"] {
+  /* Game-UI tones — azul-violeta frio, lembrando o plástico "Indigo" do GBA */
+  --bg-page:      #11131F;
+  --bg-card:      #1C2036;
+  --bg-surface:   #232A4A;
+  --border-gold:  #4FD2E0;
+  --border-silver:#7B85B0;
+  --text-white:   #F4F6FF;
+  --text-offwhite:#D8DCF0;
+  --text-gray:    #848EB8;
+  --text-dark:    #14172A;
+
+  --tcg-frame:      #232A4A;
+  --tcg-frame-lite: #3C4570;
+  --tcg-holo-1:     rgba(79,210,224,0.07);
+  --tcg-holo-2:     rgba(123,133,176,0.05);
+  --tcg-holo-3:     rgba(79,210,224,0.04);
+
+  /* Cantos um pouco mais suaves que o GBC — design mais "tecnológico" */
+  --radius-sm:  4px;
+  --radius-md:  6px;
+  --radius-lg:  9px;
+  --radius-xl:  12px;
+  --radius-card: 8px;
+
+  /* Sombras duras, mas levemente mais suaves que o GBC */
+  --shadow-sm:  2px 2px 0 rgba(0,0,0,0.45);
+  --shadow-md:  3px 3px 0 rgba(0,0,0,0.45);
+  --shadow-lg:  4px 4px 1px rgba(0,0,0,0.5);
+  --shadow-gold: 0 0 0 2px rgba(79,210,224,0.45);
+
+  --transition: 0.1s ease-out;
+}
+
+/* ---- TIPOGRAFIA: bitmap em mais lugares (mesma lógica do GBC) ---- */
+[data-theme="gba"] .section-title,
+[data-theme="gba"] .subsection-title,
+[data-theme="gba"] .navbar-brand span,
+[data-theme="gba"] .pdx-card-name,
+[data-theme="gba"] .modal-pokemon-name,
+[data-theme="gba"] .item-card-name,
+[data-theme="gba"] label,
+[data-theme="gba"] button,
+[data-theme="gba"] .btn,
+[data-theme="gba"] .navbar-nav a,
+[data-theme="gba"] .theme-pick-trigger,
+[data-theme="gba"] .sheet-tab-name {
+  font-family: 'Press Start 2P', monospace;
+  letter-spacing: 0;
+}
+
+[data-theme="gba"] .pdx-card-name,
+[data-theme="gba"] .item-card-name {
+  font-size: 0.52rem;
+}
+
+[data-theme="gba"] label { font-size: 0.62rem; line-height: 1.6; }
+[data-theme="gba"] .btn,
+[data-theme="gba"] button { font-size: 0.66rem; }
+[data-theme="gba"] .navbar-nav a { font-size: 0.6rem; }
+
+/* Botões de ícone único voltam pra fonte de sistema (mesma exceção do GBC) */
+[data-theme="gba"] .pdx-modal-close,
+[data-theme="gba"] .theme-modal-close,
+[data-theme="gba"] .sheet-tab-close,
+[data-theme="gba"] .sheet-tab-add,
+[data-theme="gba"] .ball-counter-btn {
+  font-family: 'Nunito', sans-serif;
+  font-size: inherit;
+}
+
+/* ---- BORDAS FIRMES (um pouco mais finas que o GBC) ---- */
+[data-theme="gba"] .section,
+[data-theme="gba"] .pdx-card-inner,
+[data-theme="gba"] .item-card-inner,
+[data-theme="gba"] .farm-card-inner,
+[data-theme="gba"] .ball-counter-card,
+[data-theme="gba"] .tcg-card-inner {
+  border-width: 2px;
+  border-style: solid;
+  border-color: var(--tcg-frame-lite);
+}
+
+/* Sem verniz holográfico — mesma lógica do GBC */
+[data-theme="gba"] .pdx-card::before,
+[data-theme="gba"] .item-card::before,
+[data-theme="gba"] .ball-counter-card::after,
+[data-theme="gba"] .tcg-card::before {
+  display: none;
+}
+
+/* Sprites pixelados não suavizam ao escalar */
+[data-theme="gba"] img.pdx-card-img,
+[data-theme="gba"] img.modal-pokemon-image img,
+[data-theme="gba"] .modal-pokemon-image img,
+[data-theme="gba"] .tcg-card-art img {
+  image-rendering: pixelated;
+}
+
+/* Navbar num tom mais "tela ligada" índigo */
+[data-theme="gba"] .navbar {
+  background: linear-gradient(180deg, #2C3568 0%, #1E2548 100%);
+  border-bottom: 3px solid var(--border-gold);
+}
+
+
+/* ---- SPRITES DE ITENS: filtro pra combinar com a paleta GBA ----
+   GBA tinha tela mais brilhante/saturada — levemente mais vibrante. */
+[data-theme="gba"] .item-card-img,
+[data-theme="gba"] .ball-counter-img,
+[data-theme="gba"] .modal-item-image img {
+  filter: saturate(1.15) brightness(1.05) drop-shadow(0 2px 4px rgba(0,0,0,0.45));
+  image-rendering: pixelated;
+}

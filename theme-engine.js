@@ -26,7 +26,6 @@ const THEMES = [
     descricao: 'Cartas holográficas, artwork oficial moderno',
     icone: '🃏',
     spriteKey: 'official-artwork',
-    frame: null, // sem moldura de hardware
   },
   {
     id: 'gbc',
@@ -34,8 +33,6 @@ const THEMES = [
     descricao: 'Pixel art da era Crystal/Gold/Silver',
     icone: '🎮',
     spriteKey: 'gen2-crystal',
-    frame: 'gbc',
-    emBreve: true,
   },
   {
     id: 'gba',
@@ -43,8 +40,6 @@ const THEMES = [
     descricao: 'Pixel art da era Fire Red/Leaf Green',
     icone: '📟',
     spriteKey: 'gen3-frlg',
-    frame: 'gba',
-    emBreve: true,
   },
   {
     id: 'ds',
@@ -52,8 +47,6 @@ const THEMES = [
     descricao: 'Pixel art animado da era Black/White',
     icone: '🕹️',
     spriteKey: 'gen5-bw-anim',
-    frame: 'ds',
-    emBreve: true,
   },
   {
     id: 'home',
@@ -61,8 +54,6 @@ const THEMES = [
     descricao: 'Renders 3D no estilo Pokémon Home',
     icone: '✨',
     spriteKey: 'home-3d',
-    frame: null,
-    emBreve: true,
   },
 ];
 
@@ -85,14 +76,11 @@ function setCurrentThemeId(id) {
 function applyTheme(id) {
   const theme = getThemeById(id);
   document.documentElement.setAttribute('data-theme', theme.id);
-  document.documentElement.setAttribute('data-frame', theme.frame || 'none');
   document.querySelectorAll('.theme-pick-btn').forEach(btn => {
     btn.classList.toggle('active', btn.dataset.themeId === theme.id);
   });
   const labelEl = document.getElementById('themeButtonLabel');
   if (labelEl) labelEl.textContent = `${theme.icone} ${theme.nome}`;
-  // Avisa a página (Pokédex, Ficha etc.) que o tema mudou, pra ela poder
-  // re-renderizar sprites já carregados sem precisar refazer fetch na API.
   document.dispatchEvent(new CustomEvent('rpgpokemon:themechange', { detail: { theme: theme.id } }));
 }
 
@@ -135,7 +123,31 @@ function getThemeSpriteUrlById(pokemonId) {
   return getThemeSpriteUrl(pokemonId, null);
 }
 
-// ---- UI: botão + modal de seleção ----
+// Sprites antigos (Crystal vai só até #251, Fire Red/Leaf Green até #386
+// etc.) não existem pra Pokémon de gerações mais novas — a PokeAPI retorna
+// front_default: null e a URL hardcoded de fallback dá 404. Em vez de
+// deixar a <img> quebrada, troca pra esta silhueta "?" estilo Pokédex não
+// vista. É um SVG inline (data URI), então funciona sempre, sem rede.
+const SPRITE_NOT_FOUND_PLACEHOLDER = 'data:image/svg+xml;utf8,' + encodeURIComponent(`
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <rect width="64" height="64" fill="none"/>
+  <path d="M32 12c-9 0-15 6-15 13h8c0-4 3-6 7-6s6 2 6 5c0 3-2 4-5 7-3 2-5 5-5 10h8c0-3 1-5 4-7 3-3 6-6 6-11 0-7-6-11-14-11z"
+        fill="#9098a8"/>
+  <rect x="28" y="44" width="8" height="8" fill="#9098a8"/>
+</svg>`.trim());
+
+// Anexa um onerror seguro num <img> de sprite: se a URL de tema falhar,
+// cai pro placeholder "?" ao invés de ícone de imagem quebrada do navegador.
+// Uso: <img src="..." onerror="window.spriteFallback(this)">
+function spriteFallback(imgEl) {
+  if (imgEl.dataset.fallbackApplied) return; // evita loop se o placeholder também falhar
+  imgEl.dataset.fallbackApplied = '1';
+  imgEl.src = SPRITE_NOT_FOUND_PLACEHOLDER;
+  imgEl.classList.add('sprite-not-found');
+}
+window.spriteFallback = spriteFallback;
+
+
 function buildThemeButtonHTML() {
   const current = getThemeById(getCurrentThemeId());
   return `

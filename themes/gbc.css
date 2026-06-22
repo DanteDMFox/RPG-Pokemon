@@ -1,0 +1,141 @@
+/* ============================================
+   TEMA: GAME BOY COLOR
+   Inspirado na interface dos jogos Gold/Silver/Crystal: telas roxo-azuladas
+   profundas, contornos grossos e duros (sem blur de sombra), cantos quase
+   retos, tipografia bitmap em mais lugares, e paleta saturada típica da
+   tela colorida do GBC.
+
+   Esta etapa (Parte 1) cobre cores, fonte e sprites. A moldura física do
+   aparelho (bezel do Game Boy Color ao redor da tela) fica pra Parte 2,
+   controlada via [data-frame="gbc"] — não existe ainda neste arquivo.
+   ============================================ */
+
+[data-theme="gbc"] {
+  /* Game-UI tones — fundo roxo-azulado profundo, como a tela "ligada" do GBC */
+  --bg-page:      #161320;
+  --bg-card:      #221C36;
+  --bg-surface:   #2E2150;
+  --border-gold:  #FFD23F;
+  --border-silver:#8C94B8;
+  --text-white:   #F8F8F0;
+  --text-offwhite:#E0DCEC;
+  --text-gray:    #9088B0;
+  --text-dark:    #1A1626;
+
+  /* "TCG card system" vars são reaproveitadas como o frame de qualquer
+     painel/caixa no tema GBC — sem holo, com contorno grosso sólido */
+  --tcg-frame:      #2E2150;
+  --tcg-frame-lite: #4A3A78;
+  --tcg-holo-1:     rgba(255,210,63,0.06);
+  --tcg-holo-2:     rgba(140,148,184,0.05);
+  --tcg-holo-3:     rgba(255,210,63,0.04);
+
+  /* Cantos quase retos (telas de menu GBC não tinham curvas suaves) */
+  --radius-sm:  2px;
+  --radius-md:  3px;
+  --radius-lg:  4px;
+  --radius-xl:  6px;
+  --radius-card: 4px;
+
+  /* Sombras duras, sem blur — efeito "pixel drop shadow" ao invés de
+     sombra realista suave */
+  --shadow-sm:  2px 2px 0 rgba(0,0,0,0.5);
+  --shadow-md:  3px 3px 0 rgba(0,0,0,0.5);
+  --shadow-lg:  4px 4px 0 rgba(0,0,0,0.55);
+  --shadow-gold: 0 0 0 2px rgba(255,210,63,0.5);
+
+  --transition: 0.08s steps(2, end);
+}
+
+/* ---- TIPOGRAFIA: bitmap em mais lugares ----
+   Fora do tema GBC, 'Press Start 2P' é só pra títulos grandes (custa
+   legibilidade em blocos de texto). No GBC, isso *é* o visual esperado —
+   aplicamos em headers/labels/botões também, mantendo Nunito só pra
+   parágrafos longos (textareas, descrições), onde bitmap ficaria
+   ilegível demais pra ser usável. */
+[data-theme="gbc"] .section-title,
+[data-theme="gbc"] .subsection-title,
+[data-theme="gbc"] .navbar-brand span,
+[data-theme="gbc"] .pdx-card-name,
+[data-theme="gbc"] .modal-pokemon-name,
+[data-theme="gbc"] .item-card-name,
+[data-theme="gbc"] label,
+[data-theme="gbc"] button,
+[data-theme="gbc"] .btn,
+[data-theme="gbc"] .navbar-nav a,
+[data-theme="gbc"] .theme-pick-trigger,
+[data-theme="gbc"] .sheet-tab-name {
+  font-family: 'Press Start 2P', monospace;
+  letter-spacing: 0;
+}
+
+[data-theme="gbc"] .pdx-card-name,
+[data-theme="gbc"] .item-card-name {
+  font-size: 0.52rem;
+}
+
+/* Botões e labels em bitmap ficam grandes demais no tamanho padrão —
+   reduz pra caber */
+[data-theme="gbc"] label { font-size: 0.62rem; line-height: 1.6; }
+[data-theme="gbc"] .btn,
+[data-theme="gbc"] button { font-size: 0.66rem; }
+[data-theme="gbc"] .navbar-nav a { font-size: 0.6rem; }
+
+/* Botões de ícone único (fechar, +/-, adicionar aba) ficam ilegíveis em
+   bitmap nesse tamanho — voltam pra fonte de sistema, só o ícone importa */
+[data-theme="gbc"] .pdx-modal-close,
+[data-theme="gbc"] .theme-modal-close,
+[data-theme="gbc"] .sheet-tab-close,
+[data-theme="gbc"] .sheet-tab-add,
+[data-theme="gbc"] .ball-counter-btn {
+  font-family: 'Nunito', sans-serif;
+  font-size: inherit;
+}
+
+/* ---- BORDAS DURAS ----
+   GBC não tinha gradientes suaves de borda; contornos sólidos de 2-3px
+   em cor única é a linguagem visual certa. */
+[data-theme="gbc"] .section,
+[data-theme="gbc"] .pdx-card-inner,
+[data-theme="gbc"] .item-card-inner,
+[data-theme="gbc"] .farm-card-inner,
+[data-theme="gbc"] .ball-counter-card,
+[data-theme="gbc"] .tcg-card-inner {
+  border-width: 3px;
+  border-style: solid;
+  border-color: var(--tcg-frame-lite);
+}
+
+/* Remove o verniz holográfico (não existe no GBC — superfícies são chapadas) */
+[data-theme="gbc"] .pdx-card::before,
+[data-theme="gbc"] .item-card::before,
+[data-theme="gbc"] .ball-counter-card::after,
+[data-theme="gbc"] .tcg-card::before {
+  display: none;
+}
+
+/* Sprites pixelados não devem suavizar ao escalar */
+[data-theme="gbc"] img.pdx-card-img,
+[data-theme="gbc"] img.modal-pokemon-image img,
+[data-theme="gbc"] .modal-pokemon-image img,
+[data-theme="gbc"] .tcg-card-art img {
+  image-rendering: pixelated;
+}
+
+/* Navbar com tom mais saturado de roxo, lembrando a barra de menu do GBC */
+[data-theme="gbc"] .navbar {
+  background: linear-gradient(180deg, #3A2C5C 0%, #2A1F46 100%);
+  border-bottom: 3px solid var(--border-gold);
+}
+
+
+/* ---- SPRITES DE ITENS: filtro pra combinar com a paleta GBC ----
+   Itens só têm um sprite na PokeAPI (sem variação por geração), então
+   compensamos com CSS: leve dessaturação + sepia quente pra remeter
+   à paleta limitada dos jogos GBC. */
+[data-theme="gbc"] .item-card-img,
+[data-theme="gbc"] .ball-counter-img,
+[data-theme="gbc"] .modal-item-image img {
+  filter: sepia(0.25) saturate(0.85) drop-shadow(0 2px 4px rgba(0,0,0,0.5));
+  image-rendering: pixelated;
+}

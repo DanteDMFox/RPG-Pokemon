@@ -1,0 +1,136 @@
+/* ============================================
+   TEMA: NINTENDO DS — era Black/White (Unova)
+   Paleta inspirada na estética urbana do Unova: quase monocromático,
+   fundos preto-carvão, acentos em branco brilhante e cinza metálico,
+   bordas de néon branco-azulado. Cantos levemente mais suaves (design
+   pós-GBA). Sprites animados de Black/White — os mais expressivos da
+   era pixel art.
+   ============================================ */
+
+[data-theme="ds"] {
+  /* Fundos quase pretos, como a tela apagada do DS Lite */
+  --bg-page:      #0E0E0E;
+  --bg-card:      #1A1A1A;
+  --bg-surface:   #242424;
+
+  /* Acentos em branco brilhante e ciano frio, como a tela superior do DS */
+  --border-gold:  #E8E8E8;
+  --border-silver:#5C6470;
+
+  --text-white:   #FFFFFF;
+  --text-offwhite:#D8DCE4;
+  --text-gray:    #6C7480;
+  --text-dark:    #0A0A0A;
+
+  /* Cards com borda metálica sutil */
+  --tcg-frame:      #1A1A1A;
+  --tcg-frame-lite: #3A3A3A;
+  --tcg-holo-1:     rgba(232,232,232,0.06);
+  --tcg-holo-2:     rgba(92,100,112,0.04);
+  --tcg-holo-3:     rgba(232,232,232,0.03);
+
+  /* Cantos moderadamente arredondados — era DS era mais "clean" que GBA */
+  --radius-sm:  4px;
+  --radius-md:  7px;
+  --radius-lg:  10px;
+  --radius-xl:  14px;
+  --radius-card: 9px;
+
+  /* Sombras voltam ao estilo suave (DS Lite tinha visual refinado) */
+  --shadow-sm:  0 2px 8px rgba(0,0,0,0.6);
+  --shadow-md:  0 4px 14px rgba(0,0,0,0.65);
+  --shadow-lg:  0 8px 28px rgba(0,0,0,0.7);
+  --shadow-gold: 0 0 0 2px rgba(232,232,232,0.3);
+
+  --transition: 0.12s ease-out;
+}
+
+/* ---- TIPOGRAFIA ----
+   DS mantém Press Start 2P nos títulos/destaques (ainda é era pixel),
+   mas menos "bitmap everywhere" que GBC/GBA — o Unova já tinha UI
+   mais clean/moderna, então só os pontos mais icônicos ficam em bitmap. */
+[data-theme="ds"] .section-title,
+[data-theme="ds"] .subsection-title,
+[data-theme="ds"] .navbar-brand span,
+[data-theme="ds"] .modal-pokemon-name,
+[data-theme="ds"] .sheet-tab-name,
+[data-theme="ds"] .theme-pick-trigger {
+  font-family: 'Press Start 2P', monospace;
+  letter-spacing: 0;
+}
+
+[data-theme="ds"] .modal-pokemon-name { font-size: 0.85rem; }
+
+/* Nomes de card ficam em Nunito (mais legíveis em grid denso) */
+[data-theme="ds"] .pdx-card-name,
+[data-theme="ds"] .item-card-name {
+  font-family: 'Nunito', sans-serif;
+  font-weight: 900;
+  font-size: 0.7rem;
+}
+
+/* ---- CARDS: bordas metálicas, sem verniz holográfico ---- */
+[data-theme="ds"] .section,
+[data-theme="ds"] .pdx-card-inner,
+[data-theme="ds"] .item-card-inner,
+[data-theme="ds"] .farm-card-inner,
+[data-theme="ds"] .ball-counter-card,
+[data-theme="ds"] .tcg-card-inner {
+  border-width: 1px;
+  border-style: solid;
+  border-color: var(--tcg-frame-lite);
+}
+
+/* O DS tinha telas brilhantes, não matte — deixa um leve gradiente
+   de reflexo nos cards ao invés de remover totalmente o holo */
+[data-theme="ds"] .pdx-card::before,
+[data-theme="ds"] .item-card::before,
+[data-theme="ds"] .ball-counter-card::after,
+[data-theme="ds"] .tcg-card::before {
+  opacity: 0.15;
+  background: linear-gradient(120deg,
+    rgba(255,255,255,0.18) 0%, transparent 40%,
+    rgba(255,255,255,0.08) 60%, transparent 100%);
+}
+
+/* Sprites animados B/W: não pixelizar (são sprites modernos com suavização
+   intencional dos GIFs), ao contrário do GBC/GBA que eram chunky. */
+[data-theme="ds"] img.pdx-card-img,
+[data-theme="ds"] img.modal-pokemon-image img,
+[data-theme="ds"] .modal-pokemon-image img,
+[data-theme="ds"] .tcg-card-art img {
+  image-rendering: auto;
+}
+
+/* ---- NAVBAR ----
+   Fundo quase preto com linha branca embaixo — como o dashboard do jogo */
+[data-theme="ds"] .navbar {
+  background: linear-gradient(180deg, #1C1C1C 0%, #0E0E0E 100%);
+  border-bottom: 2px solid rgba(232,232,232,0.35);
+}
+
+[data-theme="ds"] .navbar-nav a:hover,
+[data-theme="ds"] .navbar-nav a.active {
+  background: rgba(255,255,255,0.1);
+  border-color: rgba(255,255,255,0.3);
+  color: var(--text-white);
+}
+
+[data-theme="ds"] .navbar-nav a.active {
+  border-color: var(--border-gold);
+  color: var(--border-gold);
+}
+
+/* Pokédex grid: cards com realce diferente no hover (borda branca, não dourada) */
+[data-theme="ds"] .pdx-card:hover {
+  border-color: var(--border-gold);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.6), 0 0 0 1px rgba(232,232,232,0.5);
+}
+
+/* ---- SPRITES DE ITENS: filtro pra combinar com a paleta DS/Unova ----
+   Paleta quase monocromática — leve dessaturação e brilho frio. */
+[data-theme="ds"] .item-card-img,
+[data-theme="ds"] .ball-counter-img,
+[data-theme="ds"] .modal-item-image img {
+  filter: saturate(0.75) brightness(0.95) contrast(1.05) drop-shadow(0 2px 6px rgba(0,0,0,0.6));
+}
